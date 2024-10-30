@@ -14,7 +14,12 @@ namespace Global
             CGBFlag = 0x0143,
             CartridgeType = 0x0147,
             ROMSize = 0x0148,
-            RAMSize = 0x0149
+            RAMSize = 0x0149,
+            OldLicenseeCode = 0x014B,
+            NewLicenseeCode1 = 0x0144,
+            NewLicenseeCode2 = 0x0145,
+            ROMVersion = 0x014C,
+            HeaderChecksum = 0x014D
         }
     }
     
