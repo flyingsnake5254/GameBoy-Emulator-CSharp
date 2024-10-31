@@ -1,17 +1,22 @@
 using System.Text;
 using Global.GCartridge;
+using u8 = System.Byte;
+using u16 = System.UInt16;
+using u32 = System.UInt32;
+using u64 = System.UInt64;
+
 
 public class Cartridge
 {
     // 卡匣 Header
     public string Title { get; private set; }
-    public byte CartridgeType { get; private set; }
+    public u8 CartridgeType { get; private set; }
     public int ROMSize { get; private set; }
     public int RAMSize { get; private set; }
-    public byte OldLicenseeCode { get; private set; }
+    public u8 OldLicenseeCode { get; private set; }
     public string Publisher { get; private set; }
-    public byte ROMVersion { get; private set; }
-    public byte HeaderChecksum { get; private set; }
+    public u8 ROMVersion { get; private set; }
+    public u8 HeaderChecksum { get; private set; }
 
 
 
@@ -132,7 +137,7 @@ public class Cartridge
     {
         try
         {
-            byte[] romData = File.ReadAllBytes(path);
+            u8[] romData = File.ReadAllBytes(path);
             ParseHeader(romData);
             return true;
         }
@@ -144,7 +149,7 @@ public class Cartridge
     }
 
 
-    public void ParseHeader(byte[] romData)
+    public void ParseHeader(u8[] romData)
     {
         // Title
         if (romData[(int) Header.CGBFlag] == 0x80 || romData[(int) Header.CGBFlag] == 0xC0)
@@ -218,12 +223,23 @@ public class Cartridge
         }
 
         // 輸出卡匣 Header 到終端
-        Console.WriteLine($"{"Title", -20} : {Title, -15}");
+        Console.WriteLine($"{"Title", `-20} : {Title, -15}");
         Console.WriteLine($"{"Cartridge Type", -20} : {CartridgeTypes[CartridgeType], -15}");
         Console.WriteLine($"{"ROM Size", -20} : {ROMSize + (romData[(int) Header.ROMSize] <= 0x04 ? "KiB" : "MiB"), -15}");
         Console.WriteLine($"{"RAM Size", -20} : {RAMSize + "KiB", -15}");
         Console.WriteLine($"{"Publisher", -20} : {Publisher, -15}");
         Console.WriteLine($"{"ROMVersion", -20} : {ROMVersion, -15}");
         Console.WriteLine($"{"HeaderChecksum", -20} : {HeaderChecksum, -15:X}({(passed ? "通過" : "未通過")})");
+    }
+
+
+    public u8 CartridgeRead(u16 address)
+    {
+        
+    }
+
+    public void CartridgeWrite(u16 address, u8 value)
+    {
+        
     }
 }
