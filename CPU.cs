@@ -27,6 +27,19 @@ public class CPU
 
 
     /*
+        Instruction Type 對應到實際指令的對照表
+    */
+    private Dictionary<Instruction.EInstructionType, Delegate> _processors = new Dictionary<Instruction.EInstructionType, Delegate> 
+    {
+        { Instruction.EInstructionType.NONE, new Action(ProcNone) },
+        { Instruction.EInstructionType.NOP, new Action(ProcNOP) },
+        { Instruction.EInstructionType.DI, new Action(ProcDI) },
+        { Instruction.EInstructionType.LD, new Action(ProcLD) },
+        { Instruction.EInstructionType.XOR, new Action(ProcXOR) },
+        { Instruction.EInstructionType.JP, new Action(ProcJP) }
+    };
+
+    /*
         Error Code
     */
     private const int UNKNOWN_ADDRESS_MODE = -6;
@@ -192,5 +205,40 @@ public class CPU
             default:
                 return 0;
         }
+    }
+
+
+    /*
+        指令
+    */
+    private static void ProcNone()
+    {
+        Console.WriteLine("無效的指令");
+        Environment.Exit(UNKNOWN_INSTRUCTION);
+    }
+
+    private static void ProcNOP()
+    {
+
+    }
+
+    private static void ProcDI()
+    {
+        // TODO...
+    }
+
+    private static void ProcLD()
+    {
+        // TODO...
+    }
+
+    private static void ProcXOR()
+    {
+        // TODO...
+    }
+
+    private static void ProcJP()
+    {
+        // TODO...
     }
 }
