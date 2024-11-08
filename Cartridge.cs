@@ -309,4 +309,16 @@ public class Cartridge
 
         header.Output();
     }
+
+
+    public static u8 CartridgeRead(u16 address)
+    {
+        return _romData[address];
+    }
+
+
+    public static void CartridgeWrite(u16 address, u8 value)
+    {
+        _romData[address] = value;
+    }
 }
