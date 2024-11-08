@@ -63,9 +63,12 @@ public class CPU
     {
         if (_hallted == false)
         {
+            Console.WriteLine($"Bef Fetch: Current Opcode - {_currentOpcode, 0:X2} | PC : {_registers.PC, 0:X4}");
             FetchInstruction();
             FetchData();
+            Console.WriteLine($"Aft Fetch: Current Opcode - {_currentOpcode, 0:X2} | PC : {_registers.PC, 0:X4}");
             Execute();
+            Console.WriteLine("------------------");
         }
         return true;
     }
@@ -109,21 +112,19 @@ public class CPU
                 return;
 
             case Instruction.EAddressMode.RegD8:
-                _fetchData = Bus.BusRead(_registers.PC);
+                _fetchData = Bus.BusRead(_registers.PC ++);
                 Emulator.EmulatorCycles(1);
-                _registers.PC ++;
                 return;
             
             case Instruction.EAddressMode.D16:
-                u8 low = Bus.BusRead(_registers.PC);
+                u8 low = Bus.BusRead(_registers.PC ++);
                 Emulator.EmulatorCycles(1);
 
-                u8 high = Bus.BusRead(_registers.PC);
+                u8 high = Bus.BusRead(_registers.PC ++);
                 Emulator.EmulatorCycles(1);
 
                 _fetchData = (u16) (low | (high << 8));
 
-                _registers.PC += 2;
                 return;
 
             default:
@@ -136,8 +137,7 @@ public class CPU
 
     public void Execute()
     {
-        Console.WriteLine($"Execute() : Current Opcode - {_currentOpcode, 0:X2} | PC : {_registers.PC, 0:X4}");
-        // Console.WriteLine("Execute 尚未實現");
+        Console.WriteLine("Execute 尚未實現");
     }
 
 
