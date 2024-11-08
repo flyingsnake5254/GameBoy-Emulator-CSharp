@@ -91,4 +91,10 @@ public class Emulator
 
         return 0;
     }
+
+
+    public static void EmulatorCycles(int cpuCycles)
+    {
+        // TODO...
+    }
 }
