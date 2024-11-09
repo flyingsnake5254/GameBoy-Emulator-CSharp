@@ -19,4 +19,20 @@ public class Bus
     {
         Cartridge.CartridgeWrite(address, value);
     }
+
+
+    public static u16 BusRead16(u16 address)
+    {
+        u16 lo = BusRead(address);
+        u16 hi = BusRead((u16)(address + 1));
+
+        return (u16)(lo | (hi << 8));
+    }
+
+    public static void BusWrite16(u16 address, u16 value)
+    {
+        BusWrite((u16)(address + 1), (u8)((value >> 8) & 0xFF));
+        BusWrite(address, (u8)(value & 0xFF));
+    }
+
 }
