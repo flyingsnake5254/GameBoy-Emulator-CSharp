@@ -128,6 +128,8 @@ public class CPU
                 return;
 
             case Instruction.EAddressMode.D8:
+                _fetchData = Bus.BusRead(_registers.PC ++);
+                Emulator.EmulatorCycles(1);
                 return;
             
             case Instruction.EAddressMode.RegReg:
@@ -150,6 +152,7 @@ public class CPU
                 return;
 
             case Instruction.EAddressMode.A8Reg:
+
                 return;
 
             case Instruction.EAddressMode.RegA8:
@@ -174,9 +177,21 @@ public class CPU
                 return;
             
             case Instruction.EAddressMode.RegMem:
+                u16 addr = ReadReg(_currentInstruction.RegisterType2);
+                if (_currentInstruction.RegisterType2 == Instruction.ERegisterType.C)
+                {
+                    addr = (u16) (addr | 0xFF00);
+                }
+                _fetchData = Bus.BusRead(addr);
+                Emulator.EmulatorCycles(1);
                 return;
             
             case Instruction.EAddressMode.Mem:
+                _memoryDestination = ReadReg(_currentInstruction.RegisterType1);
+                _destinationIsMemory = true;
+                _fetchData = Bus.BusRead(ReadReg(_currentInstruction.RegisterType1));
+                Emulator.EmulatorCycles(1);
+
                 return;
             
             case Instruction.EAddressMode.RegD8:
@@ -185,6 +200,10 @@ public class CPU
                 return;
             
             case Instruction.EAddressMode.MemD8:
+                _fetchData = Bus.BusRead(_registers.PC ++);
+                Emulator.EmulatorCycles(1);
+                _memoryDestination = ReadReg(_currentInstruction.RegisterType1);
+                _destinationIsMemory = true;
                 return;
 
             case Instruction.EAddressMode.A16Reg:
