@@ -509,12 +509,20 @@ public class CPU
             {
                 Bus.BusWrite(_memoryDestination, (u8) _fetchData);
             }
+            return;
         }
 
         if (_currentInstruction.AddressMode == Instruction.EAddressMode.HLSPR)
         {
-            
+            // 針對 LD HL,SP+r8
+            u8 hFlag = (u8) ((ReadReg(_currentInstruction.RegisterType2) & 0xF) + (_fetchData & 0xF) > 0xF ? 1 : 0);
+            u8 cFlag = (u8) ((ReadReg(_currentInstruction.RegisterType2) & 0xFF) + (_fetchData & 0xFF) > 0xFF ? 1 : 0);
+            SetCPUFlag(0, 0, hFlag, cFlag);
+            SetReg(_currentInstruction.RegisterType1, (u16) (_currentInstruction.RegisterType2 + _fetchData));
+            return;
         }
+
+        SetReg(_currentInstruction.RegisterType1, _fetchData);
     }
 
     private void ProcXOR()
