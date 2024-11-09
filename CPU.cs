@@ -29,15 +29,7 @@ public class CPU
     /*
         Instruction Type 對應到實際指令的對照表
     */
-    private Dictionary<Instruction.EInstructionType, Delegate> _processors = new Dictionary<Instruction.EInstructionType, Delegate> 
-    {
-        { Instruction.EInstructionType.NONE, new Action(ProcNone) },
-        { Instruction.EInstructionType.NOP, new Action(ProcNOP) },
-        { Instruction.EInstructionType.DI, new Action(ProcDI) },
-        { Instruction.EInstructionType.LD, new Action(ProcLD) },
-        { Instruction.EInstructionType.XOR, new Action(ProcXOR) },
-        { Instruction.EInstructionType.JP, new Action(ProcJP) }
-    };
+    private Dictionary<Instruction.EInstructionType, Delegate> _processors;
 
     /*
         Error Code
@@ -55,6 +47,7 @@ public class CPU
     private u8 _currentOpcode;
     private bool _hallted;
     private bool _stepping;
+    private bool _instructionMasterEnable;
     private Instruction _currentInstruction;
 
 
@@ -62,6 +55,15 @@ public class CPU
     public CPU()
     {
         _registers = new Registers();
+        _processors = new Dictionary<Instruction.EInstructionType, Delegate> 
+        {
+            { Instruction.EInstructionType.NONE, new Action(ProcNone) },
+            { Instruction.EInstructionType.NOP, new Action(ProcNOP) },
+            { Instruction.EInstructionType.DI, new Action(ProcDI) },
+            { Instruction.EInstructionType.LD, new Action(ProcLD) },
+            { Instruction.EInstructionType.XOR, new Action(ProcXOR) },
+            { Instruction.EInstructionType.JP, new Action(ProcJP) }
+        };
     }
 
 
@@ -76,12 +78,16 @@ public class CPU
     {
         if (_hallted == false)
         {
-            Console.WriteLine($"Bef Fetch: Current Opcode - {_currentOpcode, 0:X2} | PC : {_registers.PC, 0:X4}");
+            u16 pc = _registers.PC;
+            
             FetchInstruction();
             FetchData();
-            Console.WriteLine($"Aft Fetch: Current Opcode - {_currentOpcode, 0:X2} | PC : {_registers.PC, 0:X4}");
+            Console.WriteLine(
+                $"PC: {pc, 0:X4} " +
+                $"{Instruction.GetInstructionName(_currentInstruction.InstructionType)} " + 
+                $"({_currentOpcode, 0:X2}, {Bus.BusRead((u16) (pc + 1)), 0:X2}, {Bus.BusRead((u16) (pc + 2)), 0:X2}) " +
+                $"A:{_registers.A, 0:X2} B:{_registers.B, 0:X2} C:{_registers.C, 0:X2}");
             Execute();
-            Console.WriteLine("------------------");
         }
         return true;
     }
@@ -150,7 +156,20 @@ public class CPU
 
     public void Execute()
     {
-        Console.WriteLine("Execute 尚未實現");
+        Delegate proc;
+        if (_processors.TryGetValue(_currentInstruction.InstructionType, out proc))
+        {
+            if (proc is Action action)
+            {
+                action();
+            }
+        }
+        else
+        {
+            Console.WriteLine("Execute():未找到對應指令方法");
+            Environment.Exit(-5);
+        }
+        
     }
 
 
@@ -208,6 +227,70 @@ public class CPU
     }
 
 
+    private bool GetCPUFlag(string flag)
+    {
+        switch (flag)
+        {
+            case "Z":
+                return Utils.GetBit(_registers.F, 7) == 1;
+            
+            case "C":
+                return Utils.GetBit(_registers.F, 4) == 1;
+
+            default:
+                return false;
+        }
+    }
+
+
+    private bool CheckCondition()
+    {
+        switch (_currentInstruction.ConditionType)
+        {
+            case Instruction.EConditionType.None:
+                return true;
+
+            case Instruction.EConditionType.Zero:
+                return GetCPUFlag("Z");
+
+            case Instruction.EConditionType.NotZero:
+                return !GetCPUFlag("Z");
+
+            case Instruction.EConditionType.Carry:
+                return GetCPUFlag("C");
+
+            case Instruction.EConditionType.NoCarry:
+                return !GetCPUFlag("C");
+
+            default:
+                return false;
+        }
+    }
+
+
+    private void SetCPUFlag(u8 z, u8 n, u8 h, u8 c)
+    {
+        if (z != -1)
+        {
+            _registers.F = Utils.SetBit(_registers.F, 7, z);
+        }
+
+        if (n != -1)
+        {
+            _registers.F = Utils.SetBit(_registers.F, 6, n);
+        }
+
+        if (h != -1)
+        {
+            _registers.F = Utils.SetBit(_registers.F, 5, h);
+        }
+
+        if (c != -1)
+        {
+            _registers.F = Utils.SetBit(_registers.F, 4, c);
+        }
+    }
+    
     /*
         指令
     */
@@ -217,28 +300,33 @@ public class CPU
         Environment.Exit(UNKNOWN_INSTRUCTION);
     }
 
-    private static void ProcNOP()
+    private void ProcNOP()
     {
 
     }
 
-    private static void ProcDI()
+    private void ProcDI()
+    {
+        _instructionMasterEnable = false;
+    }
+
+    private void ProcLD()
     {
         // TODO...
     }
 
-    private static void ProcLD()
+    private void ProcXOR()
     {
-        // TODO...
+        _registers.A ^= (u8) (_fetchData & 0xFF);
+        SetCPUFlag((u8) (_registers.A == 0 ? 1 : 0), 0, 0, 0);
     }
 
-    private static void ProcXOR()
+    private void ProcJP()
     {
-        // TODO...
-    }
-
-    private static void ProcJP()
-    {
-        // TODO...
+        if (CheckCondition())
+        {
+            _registers.PC = _fetchData;
+            Emulator.EmulatorCycles(1);
+        }
     }
 }
