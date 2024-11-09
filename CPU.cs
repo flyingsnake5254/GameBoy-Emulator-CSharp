@@ -48,6 +48,7 @@ public class CPU
     private bool _hallted;
     private bool _stepping;
     private bool _instructionMasterEnable;
+    private bool _destinationIsMemory;
     private Instruction _currentInstruction;
 
 
@@ -110,7 +111,7 @@ public class CPU
     {
         // 初始化狀態
         _memoryDestination = 0x0000;
-        bool destinationIsMemory = false;
+        _destinationIsMemory = false;
 
 
         // 是否有指令
@@ -126,15 +127,41 @@ public class CPU
             case Instruction.EAddressMode.Implicit:
                 return;
 
+            case Instruction.EAddressMode.D8:
+                return;
+            
+            case Instruction.EAddressMode.RegReg:
+                _fetchData = ReadReg(_currentInstruction.RegisterType2);
+                return;
+
+            case Instruction.EAddressMode.MemReg:
+                _fetchData = ReadReg(_currentInstruction.RegisterType2);
+                _memoryDestination = ReadReg(_currentInstruction.RegisterType1);
+                _destinationIsMemory = true;
+
+                if (_currentInstruction.RegisterType1 == Instruction.ERegisterType.C)
+                {
+                    _memoryDestination = (u16) (_memoryDestination | 0xFF00);
+                }
+                return;
+            
             case Instruction.EAddressMode.Reg:
                 _fetchData = ReadReg(_currentInstruction.RegisterType1);
                 return;
 
-            case Instruction.EAddressMode.RegD8:
-                _fetchData = Bus.BusRead(_registers.PC ++);
-                Emulator.EmulatorCycles(1);
+            case Instruction.EAddressMode.A8Reg:
                 return;
-            
+
+            case Instruction.EAddressMode.RegA8:
+                return;
+
+            case Instruction.EAddressMode.HLSPR:
+                return;
+
+            case Instruction.EAddressMode.RegA16:
+                return;
+
+            case Instruction.EAddressMode.RegD16:
             case Instruction.EAddressMode.D16:
                 u8 low = Bus.BusRead(_registers.PC ++);
                 Emulator.EmulatorCycles(1);
@@ -145,7 +172,40 @@ public class CPU
                 _fetchData = (u16) (low | (high << 8));
 
                 return;
+            
+            case Instruction.EAddressMode.RegMem:
+                return;
+            
+            case Instruction.EAddressMode.Mem:
+                return;
+            
+            case Instruction.EAddressMode.RegD8:
+                _fetchData = Bus.BusRead(_registers.PC ++);
+                Emulator.EmulatorCycles(1);
+                return;
+            
+            case Instruction.EAddressMode.MemD8:
+                return;
 
+            case Instruction.EAddressMode.A16Reg:
+                return;
+
+            case Instruction.EAddressMode.D16Reg:
+                return;
+
+            case Instruction.EAddressMode.HLDReg:
+                return;
+
+            case Instruction.EAddressMode.HLIReg:
+                return;
+
+            case Instruction.EAddressMode.RegHLD:
+                return;
+
+            case Instruction.EAddressMode.RegHLI:
+                return;
+            
+            
             default:
                 Console.WriteLine("Unknown Address Mode");
                 Environment.Exit(UNKNOWN_ADDRESS_MODE);
