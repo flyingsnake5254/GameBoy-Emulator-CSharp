@@ -48,6 +48,7 @@ public class CPU
     private bool _hallted;
     private bool _stepping;
     private bool _instructionMasterEnable;
+    private bool _destinationIsMemory;
     private Instruction _currentInstruction;
 
 
@@ -110,7 +111,7 @@ public class CPU
     {
         // 初始化狀態
         _memoryDestination = 0x0000;
-        bool destinationIsMemory = false;
+        _destinationIsMemory = false;
 
 
         // 是否有指令
