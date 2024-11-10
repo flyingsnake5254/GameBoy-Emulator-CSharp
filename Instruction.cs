@@ -304,11 +304,11 @@ public class Instruction
 
         // 0xC-
         // { 0xC0, new Instruction(EInstructionType.RET, EAddressMode.Implicit, ERegisterType.NONE, ERegisterType.NONE, EConditionType.NoCarry)},
-        // { 0xC1, new Instruction(EInstructionType.POP, EAddressMode.Reg, ERegisterType.BC)},
+        { 0xC1, new Instruction(EInstructionType.POP, EAddressMode.Reg, ERegisterType.BC)},
         // { 0xC2, new Instruction(EInstructionType.JP, EAddressMode.D16, ERegisterType.NONE, ERegisterType.NONE, EConditionType.NoCarry)},
         { 0xC3, new Instruction(EInstructionType.JP, EAddressMode.D16)},
         // { 0xC4, new Instruction(EInstructionType.CALL, EAddressMode.D16, ERegisterType.NONE, ERegisterType.NONE, EConditionType.NoCarry)},
-        // { 0xC5, new Instruction(EInstructionType.PUSH, EAddressMode.Reg, ERegisterType.BC)},
+        { 0xC5, new Instruction(EInstructionType.PUSH, EAddressMode.Reg, ERegisterType.BC)},
         // { 0xC6, new Instruction(EInstructionType.ADD, EAddressMode.RegD8, ERegisterType.A)},
         // { 0xC7, new Instruction(EInstructionType.RST, EAddressMode.Implicit, ERegisterType.NONE, ERegisterType.NONE, EConditionType.None, 0x00)},
         // { 0xC8, new Instruction(EInstructionType.RET, EAddressMode.Implicit, ERegisterType.NONE, ERegisterType.NONE, EConditionType.Zero)},
@@ -322,10 +322,10 @@ public class Instruction
 
         // 0xD-
         // { 0xD0, new Instruction(EInstructionType.RET, EAddressMode.Implicit, ERegisterType.NONE, ERegisterType.NONE, EConditionType.NoCarry)},
-        // { 0xD1, new Instruction(EInstructionType.POP, EAddressMode.Reg, ERegisterType.DE)},
+        { 0xD1, new Instruction(EInstructionType.POP, EAddressMode.Reg, ERegisterType.DE)},
         // { 0xD2, new Instruction(EInstructionType.JP, EAddressMode.D16, ERegisterType.NONE, ERegisterType.NONE, EConditionType.NoCarry)},
         // { 0xD4, new Instruction(EInstructionType.CALL, EAddressMode.D16, ERegisterType.NONE, ERegisterType.NONE, EConditionType.NoCarry)},
-        // { 0xD5, new Instruction(EInstructionType.PUSH, EAddressMode.Reg, ERegisterType.DE)},
+        { 0xD5, new Instruction(EInstructionType.PUSH, EAddressMode.Reg, ERegisterType.DE)},
         // { 0xD6, new Instruction(EInstructionType.SUB, EAddressMode.RegD8, ERegisterType.A)},
         // { 0xD7, new Instruction(EInstructionType.RST, EAddressMode.Implicit, ERegisterType.NONE, ERegisterType.NONE, EConditionType.None, 0x10)},
         // { 0xD8, new Instruction(EInstructionType.RET, EAddressMode.Implicit, ERegisterType.NONE, ERegisterType.NONE, EConditionType.Carry)},
@@ -337,9 +337,9 @@ public class Instruction
 
         // 0xE-
         { 0xE0, new Instruction(EInstructionType.LDH, EAddressMode.A8Reg, ERegisterType.NONE, ERegisterType.A)},
-        // { 0xE1, new Instruction(EInstructionType.POP, EAddressMode.Reg, ERegisterType.HL)},
+        { 0xE1, new Instruction(EInstructionType.POP, EAddressMode.Reg, ERegisterType.HL)},
         { 0xE2, new Instruction(EInstructionType.LD, EAddressMode.MemReg, ERegisterType.C, ERegisterType.A)},
-        // { 0xE5, new Instruction(EInstructionType.PUSH, EAddressMode.Reg, ERegisterType.HL)},
+        { 0xE5, new Instruction(EInstructionType.PUSH, EAddressMode.Reg, ERegisterType.HL)},
         // { 0xE6, new Instruction(EInstructionType.AND, EAddressMode.RegD8, ERegisterType.A)},
         // { 0xE7, new Instruction(EInstructionType.RST, EAddressMode.Implicit, ERegisterType.NONE, ERegisterType.NONE, EConditionType.None, 0x20)},
         // { 0xE8, new Instruction(EInstructionType.ADD, EAddressMode.RegD8, ERegisterType.SP)},
@@ -350,10 +350,10 @@ public class Instruction
 
         // 0xF-
         { 0xF0, new Instruction(EInstructionType.LDH, EAddressMode.RegA8, ERegisterType.A)},
-        // { 0xF1, new Instruction(EInstructionType.POP, EAddressMode.Reg, ERegisterType.AF)},
+        { 0xF1, new Instruction(EInstructionType.POP, EAddressMode.Reg, ERegisterType.AF)},
         { 0xF2, new Instruction(EInstructionType.LD, EAddressMode.RegMem, ERegisterType.A, ERegisterType.C)},
         { 0xF3, new Instruction(EInstructionType.DI, EAddressMode.Implicit)},
-        // { 0xF5, new Instruction(EInstructionType.PUSH, EAddressMode.Reg, ERegisterType.AF)},
+        { 0xF5, new Instruction(EInstructionType.PUSH, EAddressMode.Reg, ERegisterType.AF)},
         // { 0xF6, new Instruction(EInstructionType.OR, EAddressMode.RegD8, ERegisterType.A)},
         // { 0xF7, new Instruction(EInstructionType.RST, EAddressMode.Implicit, ERegisterType.NONE, ERegisterType.NONE, EConditionType.None, 0x30)},
         // { 0xF8, new Instruction(EInstructionType.LD, EAddressMode.HLSPR, ERegisterType.HL, ERegisterType.SP)},

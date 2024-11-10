@@ -65,7 +65,9 @@ public class CPU
             { Instruction.EInstructionType.LD, new Action(ProcLD) },
             { Instruction.EInstructionType.XOR, new Action(ProcXOR) },
             { Instruction.EInstructionType.JP, new Action(ProcJP) },
-            { Instruction.EInstructionType.LDH, new Action(ProcLDH)}
+            { Instruction.EInstructionType.LDH, new Action(ProcLDH)},
+            { Instruction.EInstructionType.POP, new Action(ProcPOP)},
+            { Instruction.EInstructionType.PUSH, new Action(ProcPUSH)},
         };
     }
 
@@ -562,6 +564,36 @@ public class CPU
         {
             Bus.BusWrite((u16) (0xFF00 | _fetchData), _registers.A);
         }
+
+        Emulator.EmulatorCycles(1);
+    }
+
+    private void ProcPOP()
+    {
+        u16 low = Stack.Pop(ref _registers.SP);
+        Emulator.EmulatorCycles(1);
+        u16 high = Stack.Pop(ref _registers.SP);
+        Emulator.EmulatorCycles(1);
+
+        u16 value = (u16) ((high << 8) | low);
+
+        SetReg(_currentInstruction.RegisterType1, value);
+
+        if (_currentInstruction.RegisterType1 == Instruction.ERegisterType.AF)
+        {
+            SetReg(_currentInstruction.RegisterType1, (u16) (value & 0xFFF0));
+        }
+    }
+
+    private void ProcPUSH()
+    {
+        u8 high = (u8) ((ReadReg(_currentInstruction.RegisterType1) >> 8) & 0xFF);
+        Emulator.EmulatorCycles(1);
+        Stack.Push(ref _registers.SP, high);
+
+        u8 low = (u8) (ReadReg(_currentInstruction.RegisterType1) & 0xFF);
+        Emulator.EmulatorCycles(1);
+        Stack.Push(ref _registers.SP, low);
 
         Emulator.EmulatorCycles(1);
     }
