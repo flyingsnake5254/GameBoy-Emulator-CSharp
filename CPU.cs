@@ -1,5 +1,5 @@
 using u8 = System.Byte;
-using u16 = System.Int16;
+using u16 = System.UInt16;
 
 
 public class CPU
