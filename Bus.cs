@@ -1,5 +1,5 @@
 using u8 = System.Byte;
-using u16 = System.Int16;
+using u16 = System.UInt16;
 
 public class Bus
 {
@@ -17,7 +17,13 @@ public class Bus
 
     public static void BusWrite(u16 address, u8 value)
     {
-        Cartridge.CartridgeWrite(address, value);
+        Console.WriteLine($"--Bus Write : {address, 0:X4}");
+        if (address < 0x8000)
+        {
+            Cartridge.CartridgeWrite(address, value);
+            return;
+        }
+        Console.WriteLine($"BusWrite() 尚未實現 - address:{address}");
     }
 
 
