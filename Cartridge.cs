@@ -1,6 +1,6 @@
 using u8 = System.Byte;
-using u16 = System.Int16;
-using u32 = System.Int32;
+using u16 = System.UInt16;
+using u32 = System.UInt32;
 using System.Text;
 
 
@@ -151,9 +151,9 @@ public class Cartridge
             ManufacturerCode = manufacturerCode;
             CartridgeType = cartridgeType;
             ROMSizeValue = romSizeValue;
-            ROMSize = 32 * (1 << romSizeValue) * 1024; // ROM Size = 32 KiB × (1 << <value>)
+            ROMSize = (u32) (32 * (1 << romSizeValue) * 1024); // ROM Size = 32 KiB × (1 << <value>)
             RAMSizeValue = ramSizeValue;
-            RAMSize = RAMSizes[RAMSizeValue] * 1024;
+            RAMSize = (u32) (RAMSizes[RAMSizeValue] * 1024);
             OldLicenseCode = oldLicenseCode;
             NewLicenseCode = newLicenseCode;
             Publisher = publisher;
