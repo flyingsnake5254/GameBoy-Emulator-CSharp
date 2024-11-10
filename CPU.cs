@@ -72,7 +72,7 @@ public class CPU
     public void Init()
     {
         _registers.PC = 0x100;
-        Console.WriteLine("CPU 初始化成功");
+        Console.WriteLine("V CPU 初始化成功");
     }
 
     public bool Step()
@@ -101,7 +101,7 @@ public class CPU
 
         if (_currentInstruction == null)
         {
-            Console.WriteLine($"Unknown Instruction : {_currentOpcode, 0:X2}");
+            Console.WriteLine($"找不到 opcode 對應的 Instruction : {_currentOpcode, 0:X2}");
             Environment.Exit(UNKNOWN_INSTRUCTION);
         }
     }

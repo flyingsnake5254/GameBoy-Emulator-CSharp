@@ -319,7 +319,6 @@ public class Cartridge
 
     public static void CartridgeWrite(u16 address, u8 value)
     {
-        Console.WriteLine($"--Cartridge Write: {address, 0:X4}");
         _romData[address] = value;
     }
 }

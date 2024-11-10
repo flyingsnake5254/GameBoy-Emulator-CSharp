@@ -123,3 +123,51 @@ PC: 0101 JP (C3, 50, 01) A:01 B:00 C:00
 PC: 0150 DI (F3, 31, FF) A:01 B:00 C:00
 Unknown Instruction : 31
 ```
+
+---
+
+# Part 4
+
+### 完成功能
+- 完成 CPU LD 指令執行
+
+### 運行指令
+```bash
+dotnet run path/to/file.gb
+# gb 檔案可選 :
+# mem_timing.gb , cpu_instrs.gb, dmg-acid2.gb
+```
+
+
+### 運行結果
+本例使用 `mem_timing.gb`
+```bash
+V 參數輸入完成
+卡匣 ROM Size : 65536 bytes
+Title                | MEM_TIMING         
+CGB Flag             | 128                 
+Manufacturer Code    |                 
+Cartridge Type       | MBC1                
+ROM Size Value       | 1                   
+ROM Size             | 65536 bytes
+RAM Size Value       | 0 bytes
+RAM Size             | 0 bytes
+Old License Code     | 0                   
+New License Code     |                     
+Publisher            | None                
+ROM Version          | 1                   
+Header Check Sum     | 95                   PASSED
+V 卡匣載入成功
+V SDL 初始化成功
+V TTF 初始化成功
+V CPU 初始化成功
+PC: 0100 NOP (00, C3, 37) A:00 B:00 C:00
+PC: 0101 JP (C3, 37, 06) A:00 B:00 C:00
+PC: 0637 JP (C3, 30, 04) A:00 B:00 C:00
+PC: 0430 DI (F3, 31, FF) A:00 B:00 C:00
+PC: 0431 LD (31, FF, DF) A:00 B:00 C:00
+PC: 0434 LD (EA, 00, D6) A:00 B:00 C:00
+BusWrite() 尚未實現 - address:D600
+PC: 0437 LD (3E, 00, E0) A:00 B:00 C:00
+找不到 opcode 對應的 Instruction : E0
+```

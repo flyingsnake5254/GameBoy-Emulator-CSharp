@@ -10,20 +10,19 @@ public class Bus
         {
             return Cartridge.CartridgeRead(address);
         }
-        Console.WriteLine("BusRead() 尚未實現");
+        Console.WriteLine("BusRead() 尚未實現 - address:{address, 0:X4}");
         return 0;
     }
 
 
     public static void BusWrite(u16 address, u8 value)
     {
-        Console.WriteLine($"--Bus Write : {address, 0:X4}");
         if (address < 0x8000)
         {
             Cartridge.CartridgeWrite(address, value);
             return;
         }
-        Console.WriteLine($"BusWrite() 尚未實現 - address:{address}");
+        Console.WriteLine($"BusWrite() 尚未實現 - address:{address, 0:X4}");
     }
 
 

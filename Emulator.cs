@@ -45,16 +45,16 @@ public class Emulator
             Console.WriteLine("用法：dotnet run file.gb");
             return (int) RunResultCode.ArgsFormatWrong;
         }
-        Console.WriteLine("參數輸入完成");
+        Console.WriteLine("V 參數輸入完成");
 
 
         // 載入卡匣
         if (Cartridge.Load(args[0]) == false)
         {
-            Console.WriteLine("卡匣讀取失敗");
+            Console.WriteLine("X 卡匣讀取失敗");
             return (int) RunResultCode.LoadCartridgeFailed;
         }
-        Console.WriteLine("卡匣載入成功");
+        Console.WriteLine("V 卡匣載入成功");
 
 
         // 初始化 SDL
