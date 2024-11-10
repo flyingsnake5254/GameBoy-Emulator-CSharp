@@ -41,6 +41,7 @@ public class CPU
     /*
         CPU 成員變數
     */
+    public static u8 IERegister { get; set; }
     private Registers _registers;
     private u16 _fetchData;
     private u16 _memoryDestination;
@@ -63,7 +64,8 @@ public class CPU
             { Instruction.EInstructionType.DI, new Action(ProcDI) },
             { Instruction.EInstructionType.LD, new Action(ProcLD) },
             { Instruction.EInstructionType.XOR, new Action(ProcXOR) },
-            { Instruction.EInstructionType.JP, new Action(ProcJP) }
+            { Instruction.EInstructionType.JP, new Action(ProcJP) },
+            { Instruction.EInstructionType.LDH, new Action(ProcLDH)}
         };
     }
 
@@ -86,8 +88,8 @@ public class CPU
             Console.WriteLine(
                 $"PC: {pc, 0:X4} " +
                 $"{Instruction.GetInstructionName(_currentInstruction.InstructionType)} " + 
-                $"({_currentOpcode, 0:X2}, {Bus.BusRead((u16) (pc + 1)), 0:X2}, {Bus.BusRead((u16) (pc + 2)), 0:X2}) " + Environment.NewLine +
-                $"    AF:{_registers.A, 0:X2}{_registers.F, 0:X2} BC:{_registers.B, 0:X2}{_registers.C, 0:X2} DE:{_registers.D, 0:X2}{_registers.E, 0:X2} HL:{_registers.H, 0:X2}{_registers.L, 0:X2} SP:{_registers.SP, 0:X2}");
+                $"({_currentOpcode, 0:X2}, {Bus.BusRead((u16) (pc + 1)), 0:X2}, {Bus.BusRead((u16) (pc + 2)), 0:X2}) " +
+                $"    AF:{_registers.A, 0:X2}{_registers.F, 0:X2} BC:{_registers.B, 0:X2}{_registers.C, 0:X2} DE:{_registers.D, 0:X2}{_registers.E, 0:X2} HL:{_registers.H, 0:X2}{_registers.L, 0:X2} SP:{_registers.SP, 0:X4}");
             Execute();
         }
         return true;
@@ -480,7 +482,9 @@ public class CPU
             _registers.F = Utils.SetBit(_registers.F, 4, c);
         }
     }
-    
+
+
+
     /*
         指令
     */
@@ -544,5 +548,21 @@ public class CPU
             _registers.PC = _fetchData;
             Emulator.EmulatorCycles(1);
         }
+    }
+
+    private void ProcLDH()
+    {
+        // LDH A,(a8)
+        if (_currentInstruction.RegisterType1 == Instruction.ERegisterType.A)
+        {
+            SetReg(_currentInstruction.RegisterType1, Bus.BusRead((u16) (0xFF00 | _fetchData)));
+        }
+        // LDH (a8), A
+        else 
+        {
+            Bus.BusWrite((u16) (0xFF00 | _fetchData), _registers.A);
+        }
+
+        Emulator.EmulatorCycles(1);
     }
 }

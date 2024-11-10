@@ -70,6 +70,7 @@ public class Bus
         {
             // OAM
             Console.Write($"BusRead() - OAM(0xFE00-0xFE9F):{address, 0:X4} - 尚未實現");
+            // Environment.Exit(-1);
             return 0;
         }
         else if (address < 0xFF00)
@@ -81,6 +82,7 @@ public class Bus
         {
             // I/O Registers
             Console.Write($"BusRead() - I/O Registers(0xFF00-0xFF7F):{address, 0:X4} - 尚未實現");
+            // Environment.Exit(-1);
             return 0;
         }
         else if (address < 0xFFFF)
@@ -92,8 +94,7 @@ public class Bus
         {
             // address == 0xFFFF
             // IE Register (CPU Enable Register)
-            Console.Write($"BusRead() - IE Register(0xFFFF):{address, 0:X4} - 尚未實現");
-            return 0;
+            return CPU.IERegister;
         }
     }
 
@@ -109,6 +110,7 @@ public class Bus
         {
             // VRAM (Char/Map Data)
             Console.Write($"BusWrite() - VRAM(0x8000-0x9FFF):{address, 0:X4} - 尚未實現");
+            // Environment.Exit(-1);
         }
         else if (address < 0xC000)
         {
@@ -129,6 +131,7 @@ public class Bus
         {
             // OAM
             Console.Write($"BusWrite() - OAM(0xFE00-0xFE9F):{address, 0:X4} - 尚未實現");
+            // Environment.Exit(-1);
         }
         else if (address < 0xFF00)
         {
@@ -139,6 +142,7 @@ public class Bus
         {
             // I/O Registers
             Console.Write($"BusWrite() - I/O Registers(0xFF00-0xFF7F):{address, 0:X4} - 尚未實現");
+            // Environment.Exit(-1);
         }
         else if (address < 0xFFFF)
         {
@@ -149,7 +153,7 @@ public class Bus
         {
             // address == 0xFFFF
             // IE Register (CPU Enable Register)
-            Console.Write($"BusWrite() - IE Register(0xFFFF):{address, 0:X4} - 尚未實現");
+            CPU.IERegister = value;
         }
     }
 

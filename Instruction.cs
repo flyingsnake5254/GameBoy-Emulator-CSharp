@@ -336,7 +336,7 @@ public class Instruction
         // { 0xDF, new Instruction(EInstructionType.RST, EAddressMode.Implicit, ERegisterType.NONE, ERegisterType.NONE, EConditionType.None, 0x18)},
 
         // 0xE-
-        // { 0xE0, new Instruction(EInstructionType.LDH, EAddressMode.A8Reg, ERegisterType.NONE, ERegisterType.A)},
+        { 0xE0, new Instruction(EInstructionType.LDH, EAddressMode.A8Reg, ERegisterType.NONE, ERegisterType.A)},
         // { 0xE1, new Instruction(EInstructionType.POP, EAddressMode.Reg, ERegisterType.HL)},
         { 0xE2, new Instruction(EInstructionType.LD, EAddressMode.MemReg, ERegisterType.C, ERegisterType.A)},
         // { 0xE5, new Instruction(EInstructionType.PUSH, EAddressMode.Reg, ERegisterType.HL)},
@@ -349,7 +349,7 @@ public class Instruction
         // { 0xEF, new Instruction(EInstructionType.RST, EAddressMode.Implicit, ERegisterType.NONE, ERegisterType.NONE, EConditionType.None, 0x28)},
 
         // 0xF-
-        // { 0xF0, new Instruction(EInstructionType.LDH, EAddressMode.RegA8, ERegisterType.A)},
+        { 0xF0, new Instruction(EInstructionType.LDH, EAddressMode.RegA8, ERegisterType.A)},
         // { 0xF1, new Instruction(EInstructionType.POP, EAddressMode.Reg, ERegisterType.AF)},
         { 0xF2, new Instruction(EInstructionType.LD, EAddressMode.RegMem, ERegisterType.A, ERegisterType.C)},
         { 0xF3, new Instruction(EInstructionType.DI, EAddressMode.Implicit)},
