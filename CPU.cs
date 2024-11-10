@@ -286,6 +286,12 @@ public class CPU
     }
 
 
+    private u16 Reverse(u16 n)
+    {
+        return (u16)(((n & 0xFF00) >> 8) | ((n & 0x00FF) << 8));
+    }
+
+
     private u16 ReadReg(Instruction.ERegisterType regType)
     {
         switch (regType)
@@ -316,16 +322,16 @@ public class CPU
 
 
             case Instruction.ERegisterType.AF:
-                return (u16) ((_registers.F << 8) | _registers.A);
+                return Reverse((u16)((_registers.F << 8) | _registers.A));
 
             case Instruction.ERegisterType.BC:
-                return (u16) ((_registers.C << 8) | _registers.B);
+                return Reverse((u16)((_registers.C << 8) | _registers.B));
 
             case Instruction.ERegisterType.DE:
-                return (u16) ((_registers.E << 8) | _registers.D);
+                return Reverse((u16)((_registers.E << 8) | _registers.D));
 
             case Instruction.ERegisterType.HL:
-                return (u16) ((_registers.L << 8) | _registers.H);
+                return Reverse((u16)((_registers.L << 8) | _registers.H));
 
             
             case Instruction.ERegisterType.PC:
