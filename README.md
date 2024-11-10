@@ -233,3 +233,80 @@ PC: 0451 LDH (E0, 24, 21)     AF:7700 BC:0000 DE:0000 HL:0000 SP:DFFF
 BusWrite() - I/O Registers(0xFF00-0xFF7F):FF77 - 尚未實現PC: 0453 LD (21, 8F, 0B)     AF:7700 BC:0000 DE:0000 HL:0000 SP:DFFF
 找不到 opcode 對應的 Instruction : CD
 ```
+
+
+---
+
+# Part 6
+
+### 完成功能
+- 完成 POP, PUSH, JP, JR, CALL, RST, RET, RETI
+
+### 運行指令
+```bash
+dotnet run path/to/file.gb
+# gb 檔案可選 :
+# mem_timing.gb , cpu_instrs.gb, dmg-acid2.gb
+```
+
+
+### 運行結果
+本例使用 `cpu_instrs.gb`
+```bash
+V 參數輸入完成
+卡匣 ROM Size : 65536 bytes
+Title                | CPU_INSTRS         
+CGB Flag             | 128                 
+Manufacturer Code    |                 
+Cartridge Type       | MBC1                
+ROM Size Value       | 1                   
+ROM Size             | 65536 bytes
+RAM Size Value       | 0 bytes
+RAM Size             | 0 bytes
+Old License Code     | 0                   
+New License Code     |                     
+Publisher            | None                
+ROM Version          | 1                   
+Header Check Sum     | 59                   PASSED
+V 卡匣載入成功
+V SDL 初始化成功
+V TTF 初始化成功
+V CPU 初始化成功
+PC: 0100 NOP (00, C3, 37)     AF:0000 BC:0000 DE:0000 HL:0000 SP:0000
+PC: 0101 JP (C3, 37, 06)     AF:0000 BC:0000 DE:0000 HL:0000 SP:0000
+PC: 0637 JP (C3, 30, 04)     AF:0000 BC:0000 DE:0000 HL:0000 SP:0000
+PC: 0430 DI (F3, 31, FF)     AF:0000 BC:0000 DE:0000 HL:0000 SP:0000
+PC: 0431 LD (31, FF, DF)     AF:0000 BC:0000 DE:0000 HL:0000 SP:0000
+PC: 0434 LD (EA, 00, D6)     AF:0000 BC:0000 DE:0000 HL:0000 SP:DFFF
+PC: 0437 LD (3E, 00, E0)     AF:0000 BC:0000 DE:0000 HL:0000 SP:DFFF
+PC: 0439 LDH (E0, 07, 3E)     AF:0000 BC:0000 DE:0000 HL:0000 SP:DFFF
+BusWrite() - I/O Registers(0xFF00-0xFF7F):FF00 - 尚未實現PC: 043B LD (3E, 00, E0)     AF:0000 BC:0000 DE:0000 HL:0000 SP:DFFF
+PC: 043D LDH (E0, 0F, 3E)     AF:0000 BC:0000 DE:0000 HL:0000 SP:DFFF
+BusWrite() - I/O Registers(0xFF00-0xFF7F):FF00 - 尚未實現PC: 043F LD (3E, 00, E0)     AF:0000 BC:0000 DE:0000 HL:0000 SP:DFFF
+PC: 0441 LDH (E0, FF, 3E)     AF:0000 BC:0000 DE:0000 HL:0000 SP:DFFF
+BusWrite() - I/O Registers(0xFF00-0xFF7F):FF00 - 尚未實現PC: 0443 LD (3E, 00, E0)     AF:0000 BC:0000 DE:0000 HL:0000 SP:DFFF
+PC: 0445 LDH (E0, 26, 3E)     AF:0000 BC:0000 DE:0000 HL:0000 SP:DFFF
+BusWrite() - I/O Registers(0xFF00-0xFF7F):FF00 - 尚未實現PC: 0447 LD (3E, 80, E0)     AF:0000 BC:0000 DE:0000 HL:0000 SP:DFFF
+PC: 0449 LDH (E0, 26, 3E)     AF:8000 BC:0000 DE:0000 HL:0000 SP:DFFF
+PC: 044B LD (3E, FF, E0)     AF:8000 BC:0000 DE:0000 HL:0000 SP:DFFF
+PC: 044D LDH (E0, 25, 3E)     AF:FF00 BC:0000 DE:0000 HL:0000 SP:DFFF
+PC: 044F LD (3E, 77, E0)     AF:FF00 BC:0000 DE:0000 HL:0000 SP:DFFF
+PC: 0451 LDH (E0, 24, 21)     AF:7700 BC:0000 DE:0000 HL:0000 SP:DFFF
+BusWrite() - I/O Registers(0xFF00-0xFF7F):FF77 - 尚未實現PC: 0453 LD (21, 8F, 0B)     AF:7700 BC:0000 DE:0000 HL:0000 SP:DFFF
+PC: 0456 CALL (CD, A3, 02)     AF:7700 BC:0000 DE:0000 HL:0B8F SP:DFFF
+PC: 02A3 LD (7D, EA, 02)     AF:7700 BC:0000 DE:0000 HL:0B8F SP:DFFD
+PC: 02A4 LD (EA, 02, D6)     AF:8F00 BC:0000 DE:0000 HL:0B8F SP:DFFD
+PC: 02A7 LD (7C, EA, 03)     AF:8F00 BC:0000 DE:0000 HL:0B8F SP:DFFD
+PC: 02A8 LD (EA, 03, D6)     AF:0B00 BC:0000 DE:0000 HL:0B8F SP:DFFD
+PC: 02AB JR (18, 04, 3E)     AF:0B00 BC:0000 DE:0000 HL:0B8F SP:DFFD
+PC: 02B1 LD (3E, C3, EA)     AF:0B00 BC:0000 DE:0000 HL:0B8F SP:DFFD
+PC: 02B3 LD (EA, 01, D6)     AF:C300 BC:0000 DE:0000 HL:0B8F SP:DFFD
+PC: 02B6 RET (C9, F5, FE)     AF:C300 BC:0000 DE:0000 HL:0B8F SP:DFFD
+PC: 0459 CALL (CD, 8E, 03)     AF:C300 BC:0000 DE:0000 HL:0B8F SP:DFFF
+PC: 038E PUSH (E5, CD, 7B)     AF:C300 BC:0000 DE:0000 HL:0B8F SP:DFFD
+PC: 038F CALL (CD, 7B, 03)     AF:C300 BC:0000 DE:0000 HL:0B8F SP:DFFB
+PC: 037B POP (E1, E5, F5)     AF:C300 BC:0000 DE:0000 HL:0B8F SP:DFF9
+PC: 037C PUSH (E5, F5, 23)     AF:C300 BC:0000 DE:0000 HL:0392 SP:DFFB
+PC: 037D PUSH (F5, 23, 23)     AF:C300 BC:0000 DE:0000 HL:0392 SP:DFF9
+找不到 opcode 對應的 Instruction : 23
+```
