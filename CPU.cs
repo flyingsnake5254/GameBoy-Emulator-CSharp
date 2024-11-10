@@ -1,5 +1,5 @@
 using u8 = System.Byte;
-using u16 = System.Int16;
+using u16 = System.UInt16;
 
 
 public class CPU
@@ -48,6 +48,7 @@ public class CPU
     private bool _hallted;
     private bool _stepping;
     private bool _instructionMasterEnable;
+    private bool _destinationIsMemory;
     private Instruction _currentInstruction;
 
 
@@ -71,7 +72,7 @@ public class CPU
     public void Init()
     {
         _registers.PC = 0x100;
-        Console.WriteLine("CPU 初始化成功");
+        Console.WriteLine("V CPU 初始化成功");
     }
 
     public bool Step()
@@ -100,7 +101,7 @@ public class CPU
 
         if (_currentInstruction == null)
         {
-            Console.WriteLine($"Unknown Instruction : {_currentOpcode, 0:X2}");
+            Console.WriteLine($"找不到 opcode 對應的 Instruction : {_currentOpcode, 0:X2}");
             Environment.Exit(UNKNOWN_INSTRUCTION);
         }
     }
@@ -110,7 +111,7 @@ public class CPU
     {
         // 初始化狀態
         _memoryDestination = 0x0000;
-        bool destinationIsMemory = false;
+        _destinationIsMemory = false;
 
 
         // 是否有指令
@@ -119,22 +120,65 @@ public class CPU
             return;
         }
 
-
         // Address Mode 
         switch (_currentInstruction.AddressMode)
         {
             case Instruction.EAddressMode.Implicit:
                 return;
 
-            case Instruction.EAddressMode.Reg:
-                _fetchData = ReadReg(_currentInstruction.RegisterType1);
-                return;
-
-            case Instruction.EAddressMode.RegD8:
+            case Instruction.EAddressMode.D8:
                 _fetchData = Bus.BusRead(_registers.PC ++);
                 Emulator.EmulatorCycles(1);
                 return;
             
+            case Instruction.EAddressMode.RegReg:
+                _fetchData = ReadReg(_currentInstruction.RegisterType2);
+                return;
+
+            case Instruction.EAddressMode.MemReg:
+                _fetchData = ReadReg(_currentInstruction.RegisterType2);
+                _memoryDestination = ReadReg(_currentInstruction.RegisterType1);
+                _destinationIsMemory = true;
+
+                if (_currentInstruction.RegisterType1 == Instruction.ERegisterType.C)
+                {
+                    _memoryDestination = (u16) (_memoryDestination | 0xFF00);
+                }
+                return;
+            
+            case Instruction.EAddressMode.Reg:
+                _fetchData = ReadReg(_currentInstruction.RegisterType1);
+                return;
+
+            case Instruction.EAddressMode.A8Reg:
+                _memoryDestination = (u16) (Bus.BusRead(_registers.PC ++) | 0xFF00);
+                Emulator.EmulatorCycles(1);
+                _destinationIsMemory = true;
+                return;
+
+            case Instruction.EAddressMode.RegA8:
+                _fetchData = Bus.BusRead(_registers.PC ++);
+                Emulator.EmulatorCycles(1);
+                return;
+
+            case Instruction.EAddressMode.HLSPR:
+                _fetchData = Bus.BusRead(_registers.PC ++);
+                Emulator.EmulatorCycles(1);
+                return;
+
+            case Instruction.EAddressMode.RegA16:
+                u8 low3 = Bus.BusRead(_registers.PC ++);
+                Emulator.EmulatorCycles(1);
+
+                u8 high3 = Bus.BusRead(_registers.PC ++);
+                Emulator.EmulatorCycles(1);
+
+                u16 addr = (u16) (low3 | (high3 << 8));
+                _fetchData = Bus.BusRead(addr);
+                Emulator.EmulatorCycles(1);
+                return;
+
+            case Instruction.EAddressMode.RegD16:
             case Instruction.EAddressMode.D16:
                 u8 low = Bus.BusRead(_registers.PC ++);
                 Emulator.EmulatorCycles(1);
@@ -145,7 +189,76 @@ public class CPU
                 _fetchData = (u16) (low | (high << 8));
 
                 return;
+            
+            case Instruction.EAddressMode.RegMem:
+                u16 addr2 = ReadReg(_currentInstruction.RegisterType2);
+                if (_currentInstruction.RegisterType2 == Instruction.ERegisterType.C)
+                {
+                    addr = (u16) (addr2 | 0xFF00);
+                }
+                _fetchData = Bus.BusRead(addr2);
+                Emulator.EmulatorCycles(1);
+                return;
+            
+            case Instruction.EAddressMode.Mem:
+                _memoryDestination = ReadReg(_currentInstruction.RegisterType1);
+                _destinationIsMemory = true;
+                _fetchData = Bus.BusRead(ReadReg(_currentInstruction.RegisterType1));
+                Emulator.EmulatorCycles(1);
 
+                return;
+            
+            case Instruction.EAddressMode.RegD8:
+                _fetchData = Bus.BusRead(_registers.PC ++);
+                Emulator.EmulatorCycles(1);
+                return;
+            
+            case Instruction.EAddressMode.MemD8:
+                _fetchData = Bus.BusRead(_registers.PC ++);
+                Emulator.EmulatorCycles(1);
+                _memoryDestination = ReadReg(_currentInstruction.RegisterType1);
+                _destinationIsMemory = true;
+                return;
+
+            case Instruction.EAddressMode.A16Reg:
+            case Instruction.EAddressMode.D16Reg:
+                _fetchData = ReadReg(_currentInstruction.RegisterType2);
+                u16 low2 = Bus.BusRead(_registers.PC ++);
+                Emulator.EmulatorCycles(1);
+                u16 high2 = Bus.BusRead(_registers.PC ++);
+                Emulator.EmulatorCycles(1);
+
+                _memoryDestination = (u16) (low2 | (high2 << 8));
+                _destinationIsMemory = true;
+                return;
+
+            case Instruction.EAddressMode.HLDReg:
+                _fetchData = ReadReg(_currentInstruction.RegisterType2);
+                _memoryDestination = ReadReg(_currentInstruction.RegisterType1);
+                _destinationIsMemory = true;
+                SetReg(Instruction.ERegisterType.HL, (u16) (ReadReg(Instruction.ERegisterType.HL) - 1));
+                return;
+
+            case Instruction.EAddressMode.HLIReg:
+                _fetchData = ReadReg(_currentInstruction.RegisterType2);
+                _memoryDestination = ReadReg(_currentInstruction.RegisterType1);
+                _destinationIsMemory = true;
+                SetReg(Instruction.ERegisterType.HL, (u16) (ReadReg(Instruction.ERegisterType.HL) + 1));
+                return;
+
+            case Instruction.EAddressMode.RegHLD:
+                _fetchData = Bus.BusRead(ReadReg(_currentInstruction.RegisterType2));
+                Emulator.EmulatorCycles(1);
+                SetReg(Instruction.ERegisterType.HL, (u16) (ReadReg(Instruction.ERegisterType.HL) - 1));
+                return;
+
+            case Instruction.EAddressMode.RegHLI:
+                _fetchData = Bus.BusRead(ReadReg(_currentInstruction.RegisterType2));
+                Emulator.EmulatorCycles(1);
+                SetReg(Instruction.ERegisterType.HL, (u16) (ReadReg(Instruction.ERegisterType.HL) + 1));
+                return;
+            
+            
             default:
                 Console.WriteLine("Unknown Address Mode");
                 Environment.Exit(UNKNOWN_ADDRESS_MODE);
@@ -225,6 +338,77 @@ public class CPU
                 return 0;
         }
     }
+
+
+    private void SetReg(Instruction.ERegisterType regType, u16 value)
+    {
+        switch (regType)
+        {
+            case Instruction.ERegisterType.A:
+                _registers.A = (byte)(value & 0xFF);
+                break;
+
+            case Instruction.ERegisterType.F:
+                _registers.F = (byte)(value & 0xFF);
+                break;
+
+            case Instruction.ERegisterType.B:
+                _registers.B = (byte)(value & 0xFF);
+                break;
+
+            case Instruction.ERegisterType.C:
+                _registers.C = (byte)(value & 0xFF);
+                break;
+
+            case Instruction.ERegisterType.D:
+                _registers.D = (byte)(value & 0xFF);
+                break;
+
+            case Instruction.ERegisterType.E:
+                _registers.E = (byte)(value & 0xFF);
+                break;
+
+            case Instruction.ERegisterType.H:
+                _registers.H = (byte)(value & 0xFF);
+                break;
+
+            case Instruction.ERegisterType.L:
+                _registers.L = (byte)(value & 0xFF);
+                break;
+
+            case Instruction.ERegisterType.AF:
+                _registers.A = (byte)(value & 0xFF);
+                _registers.F = (byte)((value >> 8) & 0xFF);
+                break;
+
+            case Instruction.ERegisterType.BC:
+                _registers.B = (byte)((value >> 8) & 0xFF);
+                _registers.C = (byte)(value & 0xFF);
+                break;
+
+            case Instruction.ERegisterType.DE:
+                _registers.D = (byte)((value >> 8) & 0xFF);
+                _registers.E = (byte)(value & 0xFF);
+                break;
+
+            case Instruction.ERegisterType.HL:
+                _registers.H = (byte)((value >> 8) & 0xFF);
+                _registers.L = (byte)(value & 0xFF);
+                break;
+
+            case Instruction.ERegisterType.PC:
+                _registers.PC = value;
+                break;
+
+            case Instruction.ERegisterType.SP:
+                _registers.SP = value;
+                break;
+
+            default:
+                throw new ArgumentException($"Unsupported register type: {regType}");
+        }
+    }
+
 
 
     private bool GetCPUFlag(string flag)
@@ -312,7 +496,33 @@ public class CPU
 
     private void ProcLD()
     {
-        // TODO...
+        if (_destinationIsMemory)
+        {
+            // 判斷要寫入的 value 是否為 16 bit
+            if (_currentInstruction.RegisterType2 >= Instruction.ERegisterType.SP)
+            {
+                // 是 16 bit
+                Emulator.EmulatorCycles(1);
+                Bus.BusWrite16(_memoryDestination, _fetchData);
+            }
+            else
+            {
+                Bus.BusWrite(_memoryDestination, (u8) _fetchData);
+            }
+            return;
+        }
+
+        if (_currentInstruction.AddressMode == Instruction.EAddressMode.HLSPR)
+        {
+            // 針對 LD HL,SP+r8
+            u8 hFlag = (u8) ((ReadReg(_currentInstruction.RegisterType2) & 0xF) + (_fetchData & 0xF) > 0xF ? 1 : 0);
+            u8 cFlag = (u8) ((ReadReg(_currentInstruction.RegisterType2) & 0xFF) + (_fetchData & 0xFF) > 0xFF ? 1 : 0);
+            SetCPUFlag(0, 0, hFlag, cFlag);
+            SetReg(_currentInstruction.RegisterType1, (u16) (_currentInstruction.RegisterType2 + _fetchData));
+            return;
+        }
+
+        SetReg(_currentInstruction.RegisterType1, _fetchData);
     }
 
     private void ProcXOR()
