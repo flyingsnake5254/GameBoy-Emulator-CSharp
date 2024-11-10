@@ -65,6 +65,11 @@ public class CPU
             { Instruction.EInstructionType.LD, new Action(ProcLD) },
             { Instruction.EInstructionType.XOR, new Action(ProcXOR) },
             { Instruction.EInstructionType.JP, new Action(ProcJP) },
+            { Instruction.EInstructionType.JR, new Action(ProcJR)},
+            { Instruction.EInstructionType.CALL, new Action(ProcCALL)},
+            { Instruction.EInstructionType.RST, new Action(ProcRST)},
+            { Instruction.EInstructionType.RET, new Action(ProcRET)},
+            { Instruction.EInstructionType.RETI, new Action(ProcRETI)},
             { Instruction.EInstructionType.LDH, new Action(ProcLDH)},
             { Instruction.EInstructionType.POP, new Action(ProcPOP)},
             { Instruction.EInstructionType.PUSH, new Action(ProcPUSH)},
@@ -486,6 +491,20 @@ public class CPU
     }
 
 
+    private void GotoAddress (u16 address, bool pushPC)
+    {
+        if (CheckCondition())
+        {
+            if (pushPC)
+            {
+                Emulator.EmulatorCycles(2);
+                Stack.Push16(ref _registers.SP, _registers.PC);
+            }
+
+            _registers.PC = address;
+            Emulator.EmulatorCycles(1);
+        }
+    }
 
     /*
         指令
@@ -545,11 +564,52 @@ public class CPU
 
     private void ProcJP()
     {
-        if (CheckCondition())
+        GotoAddress(_fetchData, false);
+    }
+
+    private void ProcJR()
+    {
+        u16 address = (u16) (_registers.PC + ((char) (_fetchData & 0xFF)));
+        GotoAddress(address, false);
+    }
+
+    private void ProcCALL()
+    {
+        GotoAddress(_fetchData, true);
+    }
+
+    private void ProcRST()
+    {
+        GotoAddress(_currentInstruction.Param, true);
+    }
+
+    private void ProcRET()
+    {
+        if (_currentInstruction.ConditionType != Instruction.EConditionType.None)
         {
-            _registers.PC = _fetchData;
             Emulator.EmulatorCycles(1);
         }
+
+        if (CheckCondition())
+        {
+            u16 low = Stack.Pop(ref _registers.SP);
+            Emulator.EmulatorCycles(1);
+
+            u16 high = Stack.Pop(ref _registers.SP);
+            Emulator.EmulatorCycles(1);
+
+
+            u16 value = (u16) ((high << 8) | low);
+            _registers.PC = value;
+            
+            Emulator.EmulatorCycles(1);
+        }
+    }
+
+    private void ProcRETI()
+    {
+        _instructionMasterEnable = true;
+        ProcRET();
     }
 
     private void ProcLDH()
