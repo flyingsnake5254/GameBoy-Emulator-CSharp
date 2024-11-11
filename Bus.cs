@@ -48,7 +48,7 @@ public class Bus
         else if (address < 0xA000)
         {
             // VRAM (Char/Map Data)
-            Console.Write($"BusRead() - VRAM(0x8000-0x9FFF):{address, 0:X4} - 尚未實現");
+            // Console.WriteLine($"BusRead() - VRAM(0x8000-0x9FFF):{address, 0:X4} - 尚未實現");
             return 0;
         }
         else if (address < 0xC000)
@@ -69,7 +69,7 @@ public class Bus
         else if (address < 0xFEA0)
         {
             // OAM
-            Console.Write($"BusRead() - OAM(0xFE00-0xFE9F):{address, 0:X4} - 尚未實現");
+            Console.WriteLine($"BusRead() - OAM(0xFE00-0xFE9F):{address, 0:X4} - 尚未實現");
             // Environment.Exit(-1);
             return 0;
         }
@@ -81,7 +81,7 @@ public class Bus
         else if (address < 0xFF80)
         {
             // I/O Registers
-            Console.Write($"BusRead() - I/O Registers(0xFF00-0xFF7F):{address, 0:X4} - 尚未實現");
+            Console.WriteLine($"BusRead() - I/O Registers(0xFF00-0xFF7F):{address, 0:X4} - 尚未實現");
             // Environment.Exit(-1);
             return 0;
         }
@@ -109,7 +109,7 @@ public class Bus
         else if (address < 0xA000)
         {
             // VRAM (Char/Map Data)
-            Console.Write($"BusWrite() - VRAM(0x8000-0x9FFF):{address, 0:X4} - 尚未實現");
+            Console.WriteLine($"BusWrite() - VRAM(0x8000-0x9FFF):{address, 0:X4} - 尚未實現");
             // Environment.Exit(-1);
         }
         else if (address < 0xC000)
@@ -130,7 +130,7 @@ public class Bus
         else if (address < 0xFEA0)
         {
             // OAM
-            Console.Write($"BusWrite() - OAM(0xFE00-0xFE9F):{address, 0:X4} - 尚未實現");
+            Console.WriteLine($"BusWrite() - OAM(0xFE00-0xFE9F):{address, 0:X4} - 尚未實現");
             // Environment.Exit(-1);
         }
         else if (address < 0xFF00)
@@ -141,7 +141,7 @@ public class Bus
         else if (address < 0xFF80)
         {
             // I/O Registers
-            Console.Write($"BusWrite() - I/O Registers(0xFF00-0xFF7F):{address, 0:X4} - 尚未實現");
+            Console.WriteLine($"BusWrite() - I/O Registers(0xFF00-0xFF7F):{address, 0:X4} - 尚未實現");
             // Environment.Exit(-1);
         }
         else if (address < 0xFFFF)

@@ -1,5 +1,6 @@
 using u8 = System.Byte;
 using u16 = System.UInt16;
+using u32 = System.UInt32;
 
 
 public class CPU
@@ -73,6 +74,12 @@ public class CPU
             { Instruction.EInstructionType.LDH, new Action(ProcLDH)},
             { Instruction.EInstructionType.POP, new Action(ProcPOP)},
             { Instruction.EInstructionType.PUSH, new Action(ProcPUSH)},
+            { Instruction.EInstructionType.ADD, new Action(ProcADD)},
+            { Instruction.EInstructionType.INC, new Action(ProcINC)},
+            { Instruction.EInstructionType.DEC, new Action(ProcDEC)},
+            { Instruction.EInstructionType.SUB, new Action(ProcSUB)},
+            { Instruction.EInstructionType.SBC, new Action(ProcSBC)},
+            { Instruction.EInstructionType.ADC, new Action(ProcADC)},
         };
     }
 
@@ -93,10 +100,11 @@ public class CPU
             FetchInstruction();
             FetchData();
             Console.WriteLine(
-                $"PC: {pc, 0:X4} " +
+                $"{Emulator.ticks, 0:X8} PC: {pc, 0:X4} " +
                 $"{Instruction.GetInstructionName(_currentInstruction.InstructionType)} " + 
                 $"({_currentOpcode, 0:X2}, {Bus.BusRead((u16) (pc + 1)), 0:X2}, {Bus.BusRead((u16) (pc + 2)), 0:X2}) " +
-                $"    AF:{_registers.A, 0:X2}{_registers.F, 0:X2} BC:{_registers.B, 0:X2}{_registers.C, 0:X2} DE:{_registers.D, 0:X2}{_registers.E, 0:X2} HL:{_registers.H, 0:X2}{_registers.L, 0:X2} SP:{_registers.SP, 0:X4}");
+                $"    AF:{_registers.A, 0:X2}{_registers.F, 0:X2} BC:{_registers.B, 0:X2}{_registers.C, 0:X2} DE:{_registers.D, 0:X2}{_registers.E, 0:X2} HL:{_registers.H, 0:X2}{_registers.L, 0:X2} SP:{_registers.SP, 0:X4}" +
+                $"    Flag:{(Utils.GetBit(_registers.F, 7) == 1 ? "Z" : "-")}{(Utils.GetBit(_registers.F, 6) == 1 ? "N" : "-")}{(Utils.GetBit(_registers.F, 5) == 1 ? "H" : "-")}{(Utils.GetBit(_registers.F, 4) == 1 ? "C" : "-")}");
             Execute();
         }
         return true;
@@ -301,120 +309,83 @@ public class CPU
     }
 
 
-    private u16 ReadReg(Instruction.ERegisterType regType)
+    public u16 ReadReg(Instruction.ERegisterType regType)
     {
         switch (regType)
         {
-            case Instruction.ERegisterType.A:
-                return _registers.A;
-            
-            case Instruction.ERegisterType.F:
-                return _registers.F;
+            case Instruction.ERegisterType.A: return _registers.A;
+            case Instruction.ERegisterType.F: return _registers.F;
+            case Instruction.ERegisterType.B: return _registers.B;
+            case Instruction.ERegisterType.C: return _registers.C;
+            case Instruction.ERegisterType.D: return _registers.D;
+            case Instruction.ERegisterType.E: return _registers.E;
+            case Instruction.ERegisterType.H: return _registers.H;
+            case Instruction.ERegisterType.L: return _registers.L;
 
-            case Instruction.ERegisterType.B:
-                return _registers.B;
+            case Instruction.ERegisterType.AF: return (u16)((_registers.A << 8) | _registers.F);
+            case Instruction.ERegisterType.BC: return (u16)((_registers.B << 8) | _registers.C);
+            case Instruction.ERegisterType.DE: return (u16)((_registers.D << 8) | _registers.E);
+            case Instruction.ERegisterType.HL: return (u16)((_registers.H << 8) | _registers.L);
 
-            case Instruction.ERegisterType.C:
-                return _registers.C;
-
-            case Instruction.ERegisterType.D:
-                return _registers.D;
-
-            case Instruction.ERegisterType.E:
-                return _registers.E;
-
-            case Instruction.ERegisterType.H:
-                return _registers.H;
-
-            case Instruction.ERegisterType.L:
-                return _registers.L;
-
-
-            case Instruction.ERegisterType.AF:
-                return Reverse((u16)((_registers.F << 8) | _registers.A));
-
-            case Instruction.ERegisterType.BC:
-                return Reverse((u16)((_registers.C << 8) | _registers.B));
-
-            case Instruction.ERegisterType.DE:
-                return Reverse((u16)((_registers.E << 8) | _registers.D));
-
-            case Instruction.ERegisterType.HL:
-                return Reverse((u16)((_registers.L << 8) | _registers.H));
-
-            
-            case Instruction.ERegisterType.PC:
-                return _registers.PC;
-
-            case Instruction.ERegisterType.SP:
-                return _registers.SP;
-
-            default:
-                return 0;
+            case Instruction.ERegisterType.PC: return _registers.PC;
+            case Instruction.ERegisterType.SP: return _registers.SP;
+            default: return 0;
         }
     }
 
-
-    private void SetReg(Instruction.ERegisterType regType, u16 value)
+    // 設置寄存器值
+    public void SetReg(Instruction.ERegisterType regType, u16 value)
     {
         switch (regType)
         {
             case Instruction.ERegisterType.A:
-                _registers.A = (byte)(value & 0xFF);
+                _registers.A = (u8)(value & 0xFF);
                 break;
-
             case Instruction.ERegisterType.F:
-                _registers.F = (byte)(value & 0xFF);
+                _registers.F = (u8)(value & 0xFF);
                 break;
-
             case Instruction.ERegisterType.B:
-                _registers.B = (byte)(value & 0xFF);
+                _registers.B = (u8)(value & 0xFF);
                 break;
-
             case Instruction.ERegisterType.C:
-                _registers.C = (byte)(value & 0xFF);
+                _registers.C = (u8)(value & 0xFF);
                 break;
-
             case Instruction.ERegisterType.D:
-                _registers.D = (byte)(value & 0xFF);
+                _registers.D = (u8)(value & 0xFF);
                 break;
-
             case Instruction.ERegisterType.E:
-                _registers.E = (byte)(value & 0xFF);
+                _registers.E = (u8)(value & 0xFF);
                 break;
-
             case Instruction.ERegisterType.H:
-                _registers.H = (byte)(value & 0xFF);
+                _registers.H = (u8)(value & 0xFF);
                 break;
-
             case Instruction.ERegisterType.L:
-                _registers.L = (byte)(value & 0xFF);
+                _registers.L = (u8)(value & 0xFF);
                 break;
 
             case Instruction.ERegisterType.AF:
-                _registers.A = (byte)(value & 0xFF);
-                _registers.F = (byte)((value >> 8) & 0xFF);
+                _registers.A = (u8)((value >> 8) & 0xFF);
+                _registers.F = (u8)(value & 0xFF);
                 break;
 
             case Instruction.ERegisterType.BC:
-                _registers.B = (byte)((value >> 8) & 0xFF);
-                _registers.C = (byte)(value & 0xFF);
+                _registers.B = (u8)((value >> 8) & 0xFF);
+                _registers.C = (u8)(value & 0xFF);
                 break;
 
             case Instruction.ERegisterType.DE:
-                _registers.D = (byte)((value >> 8) & 0xFF);
-                _registers.E = (byte)(value & 0xFF);
+                _registers.D = (u8)((value >> 8) & 0xFF);
+                _registers.E = (u8)(value & 0xFF);
                 break;
 
             case Instruction.ERegisterType.HL:
-                _registers.H = (byte)((value >> 8) & 0xFF);
-                _registers.L = (byte)(value & 0xFF);
+                _registers.H = (u8)((value >> 8) & 0xFF);
+                _registers.L = (u8)(value & 0xFF);
                 break;
 
             case Instruction.ERegisterType.PC:
                 _registers.PC = value;
                 break;
-
             case Instruction.ERegisterType.SP:
                 _registers.SP = value;
                 break;
@@ -467,26 +438,26 @@ public class CPU
     }
 
 
-    private void SetCPUFlag(u8 z, u8 n, u8 h, u8 c)
+    private void SetCPUFlag(int z, int n, int h, int c)
     {
         if (z != -1)
         {
-            _registers.F = Utils.SetBit(_registers.F, 7, z);
+            _registers.F = Utils.SetBit(_registers.F, 7, (u8) z);
         }
 
         if (n != -1)
         {
-            _registers.F = Utils.SetBit(_registers.F, 6, n);
+            _registers.F = Utils.SetBit(_registers.F, 6, (u8) n);
         }
 
         if (h != -1)
         {
-            _registers.F = Utils.SetBit(_registers.F, 5, h);
+            _registers.F = Utils.SetBit(_registers.F, 5, (u8) h);
         }
 
         if (c != -1)
         {
-            _registers.F = Utils.SetBit(_registers.F, 4, c);
+            _registers.F = Utils.SetBit(_registers.F, 4, (u8) c);
         }
     }
 
@@ -505,6 +476,13 @@ public class CPU
             Emulator.EmulatorCycles(1);
         }
     }
+
+
+    private bool Is16Bit(Instruction.ERegisterType registerType)
+    {
+        return registerType >= Instruction.ERegisterType.SP;
+    }
+
 
     /*
         指令
@@ -546,8 +524,8 @@ public class CPU
         if (_currentInstruction.AddressMode == Instruction.EAddressMode.HLSPR)
         {
             // 針對 LD HL,SP+r8
-            u8 hFlag = (u8) ((ReadReg(_currentInstruction.RegisterType2) & 0xF) + (_fetchData & 0xF) > 0xF ? 1 : 0);
-            u8 cFlag = (u8) ((ReadReg(_currentInstruction.RegisterType2) & 0xFF) + (_fetchData & 0xFF) > 0xFF ? 1 : 0);
+            int hFlag = (int) ((ReadReg(_currentInstruction.RegisterType2) & 0xF) + (_fetchData & 0xF) > 0xF ? 1 : 0);
+            int cFlag = (int) ((ReadReg(_currentInstruction.RegisterType2) & 0xFF) + (_fetchData & 0xFF) > 0xFF ? 1 : 0);
             SetCPUFlag(0, 0, hFlag, cFlag);
             SetReg(_currentInstruction.RegisterType1, (u16) (_currentInstruction.RegisterType2 + _fetchData));
             return;
@@ -559,7 +537,7 @@ public class CPU
     private void ProcXOR()
     {
         _registers.A ^= (u8) (_fetchData & 0xFF);
-        SetCPUFlag((u8) (_registers.A == 0 ? 1 : 0), 0, 0, 0);
+        SetCPUFlag((int) (_registers.A == 0 ? 1 : 0), 0, 0, 0);
     }
 
     private void ProcJP()
@@ -656,5 +634,140 @@ public class CPU
         Stack.Push(ref _registers.SP, low);
 
         Emulator.EmulatorCycles(1);
+    }
+
+    private void ProcADD()
+    {
+        u32 value = (u32) (ReadReg(_currentInstruction.RegisterType1) + _fetchData);
+        bool is16Bit = Is16Bit(_currentInstruction.RegisterType1);
+
+        if (is16Bit)
+        {
+            Emulator.EmulatorCycles(1);
+        }
+
+        if (_currentInstruction.RegisterType1 == Instruction.ERegisterType.SP)
+        {
+            value = (u32) (ReadReg(_currentInstruction.RegisterType1) + ((char) _fetchData));
+        }
+
+        int z = (int) ((value & 0xFF) == 0 ? 1 : 0);
+        int h = (int) ((ReadReg(_currentInstruction.RegisterType1) & 0xF) + (_fetchData & 0xF) >= 0x10 ? 1 : 0);
+        int c = (int) (((ReadReg(_currentInstruction.RegisterType1) & 0xFF) + (_fetchData & 0xFF)) >= 0x100 ? 1 : 0);
+
+        if (is16Bit)
+        {
+            z = -1;
+            h = ((ReadReg(_currentInstruction.RegisterType1) & 0xFFF) + (_fetchData & 0xFFF)) >= 0x1000 ? 1 : 0;
+            u32 n = ((u32) ReadReg(_currentInstruction.RegisterType1)) + ((u32) _fetchData);
+            c = (n >= 0x10000 ? 1 : 0);
+        }
+
+        if (_currentInstruction.RegisterType1 == Instruction.ERegisterType.SP)
+        {
+            z = 0;
+            h = ((ReadReg(_currentInstruction.RegisterType1) & 0xF) + (_fetchData & 0xF)) >= 0x10 ? 1 : 0; 
+            c = ((int) (ReadReg(_currentInstruction.RegisterType1) & 0xFF) + (int) (_fetchData & 0xFF)) > 0x100 ? 1 : 0;
+        }
+
+        SetReg(_currentInstruction.RegisterType1, (u16) (value & 0xFFFF));
+        SetCPUFlag(z, 0, h, c);
+    }
+
+    private void ProcINC()
+    {
+        u16 value = (u16) (ReadReg(_currentInstruction.RegisterType1) + 1);
+
+        if (Is16Bit(_currentInstruction.RegisterType1))
+        {
+            Emulator.EmulatorCycles(1);
+        }
+
+        if (_currentInstruction.RegisterType1 == Instruction.ERegisterType.HL && _currentInstruction.AddressMode == Instruction.EAddressMode.Mem)
+        {
+            value = (u16) (Bus.BusRead(ReadReg(Instruction.ERegisterType.HL)) + 1);
+            value &= 0xFF;
+            Bus.BusWrite(ReadReg(Instruction.ERegisterType.HL), (u8) value);
+        }
+        else
+        {
+            SetReg(_currentInstruction.RegisterType1, value);
+            value = ReadReg(_currentInstruction.RegisterType1);
+        }
+
+        if ((_currentOpcode & 0x03) == 0x03)
+        {
+            return;
+        }
+
+        SetCPUFlag(value == 0 ? 1 : 0, 0, (value & 0x0F) == 0 ? 1 : 0, -1);
+    }
+
+    private void ProcDEC()
+    {
+        u16 value = (u16) (ReadReg(_currentInstruction.RegisterType1) - 1);
+
+        if (Is16Bit(_currentInstruction.RegisterType1))
+        {
+            Emulator.EmulatorCycles(1);
+        }
+
+        if (_currentInstruction.RegisterType1 == Instruction.ERegisterType.HL && _currentInstruction.AddressMode == Instruction.EAddressMode.Mem)
+        {
+            value = (u16) (Bus.BusRead(ReadReg(Instruction.ERegisterType.HL)) - 1);
+            Bus.BusWrite(ReadReg(Instruction.ERegisterType.HL), (u8) value);
+        }
+        else
+        {
+            SetReg(_currentInstruction.RegisterType1, value);
+            value = ReadReg(_currentInstruction.RegisterType1);
+        }
+
+        if ((_currentOpcode & 0x0B) == 0x0B)
+        {
+            return ;
+        }
+
+        SetCPUFlag(value == 0 ? 1 : 0, 1, (value & 0x0F) == 0x0F ? 1 : 0, -1);
+    }
+
+    private void ProcSUB()
+    {
+        u16 value = (u16) (ReadReg(_currentInstruction.RegisterType1) - _fetchData);
+
+        int z = value == 0 ? 1 : 0;
+        int h = ((((int) ReadReg(_currentInstruction.RegisterType1) & 0xF) - ((int) _fetchData & 0xF)) < 0) ? 1 : 0;
+        int c = (((int) ReadReg(_currentInstruction.RegisterType1)) - ((int) _fetchData)) < 0 ? 1 : 0;
+
+        SetReg(_currentInstruction.RegisterType1, value);
+        SetCPUFlag(z, 1, h, c);
+    }
+
+    private void ProcSBC()
+    {
+        u8 value = (u8) (_fetchData + Utils.GetBit(_registers.F, 4));
+
+        int z = ReadReg(_currentInstruction.RegisterType1) - value == 0 ? 1 : 0;
+        int h = (((int) ReadReg(_currentInstruction.RegisterType1) & 0xF) - ((int) _fetchData & 0xF) - ((int) Utils.GetBit(_registers.F, 4))) < 0 ? 1 : 0;
+        int c = (((int) ReadReg(_currentInstruction.RegisterType1)) - ((int) _fetchData) - ((int) Utils.GetBit(_registers.F, 4))) < 0 ? 1 : 0;
+
+        SetReg(_currentInstruction.RegisterType1, (u16) (ReadReg(_currentInstruction.RegisterType1) - value));
+        SetCPUFlag(z, 1, h, c);
+    }
+
+    private void ProcADC()
+    {
+        u16 u = _fetchData;
+        u16 a = _registers.A;
+        u16 c = (u16) (Utils.GetBit(_registers.F, 4));
+
+        _registers.A = (u8) ((a + u + c) & 0xFF);
+
+        SetCPUFlag(
+            _registers.A == 0 ? 1 : 0, 
+            0,
+            (((a & 0xF) + (u & 0xF) + c) > 0xF) ? 1 : 0,
+            a + u + c > 0xFF ? 1 : 0
+        );
     }
 }
