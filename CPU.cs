@@ -294,120 +294,84 @@ public class CPU
     }
 
 
-    private u16 ReadReg(Instruction.ERegisterType regType)
+    public u16 ReadReg(Instruction.ERegisterType regType)
     {
         switch (regType)
         {
-            case Instruction.ERegisterType.A:
-                return _registers.A;
-            
-            case Instruction.ERegisterType.F:
-                return _registers.F;
+            case Instruction.ERegisterType.A: return _registers.A;
+            case Instruction.ERegisterType.F: return _registers.F;
+            case Instruction.ERegisterType.B: return _registers.B;
+            case Instruction.ERegisterType.C: return _registers.C;
+            case Instruction.ERegisterType.D: return _registers.D;
+            case Instruction.ERegisterType.E: return _registers.E;
+            case Instruction.ERegisterType.H: return _registers.H;
+            case Instruction.ERegisterType.L: return _registers.L;
 
-            case Instruction.ERegisterType.B:
-                return _registers.B;
+            case Instruction.ERegisterType.AF: return (u16)((_registers.A << 8) | _registers.F);
+            case Instruction.ERegisterType.BC: return (u16)((_registers.B << 8) | _registers.C);
+            case Instruction.ERegisterType.DE: return (u16)((_registers.D << 8) | _registers.E);
+            case Instruction.ERegisterType.HL: return (u16)((_registers.H << 8) | _registers.L);
 
-            case Instruction.ERegisterType.C:
-                return _registers.C;
-
-            case Instruction.ERegisterType.D:
-                return _registers.D;
-
-            case Instruction.ERegisterType.E:
-                return _registers.E;
-
-            case Instruction.ERegisterType.H:
-                return _registers.H;
-
-            case Instruction.ERegisterType.L:
-                return _registers.L;
-
-
-            case Instruction.ERegisterType.AF:
-                return Reverse((u16)((_registers.F << 8) | _registers.A));
-
-            case Instruction.ERegisterType.BC:
-                return Reverse((u16)((_registers.C << 8) | _registers.B));
-
-            case Instruction.ERegisterType.DE:
-                return Reverse((u16)((_registers.E << 8) | _registers.D));
-
-            case Instruction.ERegisterType.HL:
-                return Reverse((u16)((_registers.L << 8) | _registers.H));
-
-            
-            case Instruction.ERegisterType.PC:
-                return _registers.PC;
-
-            case Instruction.ERegisterType.SP:
-                return _registers.SP;
-
-            default:
-                return 0;
+            case Instruction.ERegisterType.PC: return _registers.PC;
+            case Instruction.ERegisterType.SP: return _registers.SP;
+            default: return 0;
         }
     }
 
 
-    private void SetReg(Instruction.ERegisterType regType, u16 value)
+    // 設置寄存器值
+    public void SetReg(Instruction.ERegisterType regType, u16 value)
     {
         switch (regType)
         {
             case Instruction.ERegisterType.A:
-                _registers.A = (byte)(value & 0xFF);
+                _registers.A = (u8)(value & 0xFF);
                 break;
-
             case Instruction.ERegisterType.F:
-                _registers.F = (byte)(value & 0xFF);
+                _registers.F = (u8)(value & 0xFF);
                 break;
-
             case Instruction.ERegisterType.B:
-                _registers.B = (byte)(value & 0xFF);
+                _registers.B = (u8)(value & 0xFF);
                 break;
-
             case Instruction.ERegisterType.C:
-                _registers.C = (byte)(value & 0xFF);
+                _registers.C = (u8)(value & 0xFF);
                 break;
-
             case Instruction.ERegisterType.D:
-                _registers.D = (byte)(value & 0xFF);
+                _registers.D = (u8)(value & 0xFF);
                 break;
-
             case Instruction.ERegisterType.E:
-                _registers.E = (byte)(value & 0xFF);
+                _registers.E = (u8)(value & 0xFF);
                 break;
-
             case Instruction.ERegisterType.H:
-                _registers.H = (byte)(value & 0xFF);
+                _registers.H = (u8)(value & 0xFF);
                 break;
-
             case Instruction.ERegisterType.L:
-                _registers.L = (byte)(value & 0xFF);
+                _registers.L = (u8)(value & 0xFF);
                 break;
 
             case Instruction.ERegisterType.AF:
-                _registers.A = (byte)(value & 0xFF);
-                _registers.F = (byte)((value >> 8) & 0xFF);
+                _registers.A = (u8)((value >> 8) & 0xFF);
+                _registers.F = (u8)(value & 0xFF);
                 break;
 
             case Instruction.ERegisterType.BC:
-                _registers.B = (byte)((value >> 8) & 0xFF);
-                _registers.C = (byte)(value & 0xFF);
+                _registers.B = (u8)((value >> 8) & 0xFF);
+                _registers.C = (u8)(value & 0xFF);
                 break;
 
             case Instruction.ERegisterType.DE:
-                _registers.D = (byte)((value >> 8) & 0xFF);
-                _registers.E = (byte)(value & 0xFF);
+                _registers.D = (u8)((value >> 8) & 0xFF);
+                _registers.E = (u8)(value & 0xFF);
                 break;
 
             case Instruction.ERegisterType.HL:
-                _registers.H = (byte)((value >> 8) & 0xFF);
-                _registers.L = (byte)(value & 0xFF);
+                _registers.H = (u8)((value >> 8) & 0xFF);
+                _registers.L = (u8)(value & 0xFF);
                 break;
 
             case Instruction.ERegisterType.PC:
                 _registers.PC = value;
                 break;
-
             case Instruction.ERegisterType.SP:
                 _registers.SP = value;
                 break;
