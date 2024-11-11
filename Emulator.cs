@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices; //SDL2
+using u64 = System.UInt64;
 
 public class Emulator
 {
@@ -34,7 +35,9 @@ public class Emulator
     /*
         Emulator State
     */
+    public static u64 ticks { get; set; }
     private bool _running = true;
+
 
 
     public int Run(string[] args)
@@ -78,6 +81,10 @@ public class Emulator
         _cpu.Init();
 
 
+        // 初始化 ticks
+        ticks = 0;
+
+
         // 運行 Emulator
         while (_running)
         {
@@ -86,6 +93,8 @@ public class Emulator
                 Console.WriteLine("X CPU 停止運行");
                 return (int) RunResultCode.CPUStalls;
             }
+
+            ticks += 1;
         }
 
 
