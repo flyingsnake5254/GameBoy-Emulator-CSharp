@@ -303,7 +303,7 @@ public class Instruction
         // { 0xBF, new Instruction(EInstructionType.CP, EAddressMode.RegReg, ERegisterType.A, ERegisterType.A)},
 
         // 0xC-
-        // { 0xC0, new Instruction(EInstructionType.RET, EAddressMode.Implicit, ERegisterType.NONE, ERegisterType.NONE, EConditionType.NoZero)},
+        // { 0xC0, new Instruction(EInstructionType.RET, EAddressMode.Implicit, ERegisterType.NONE, ERegisterType.NONE, EConditionType.NotZero)},
         // { 0xC1, new Instruction(EInstructionType.POP, EAddressMode.Reg, ERegisterType.BC)},
         // { 0xC2, new Instruction(EInstructionType.JP, EAddressMode.D16, ERegisterType.NONE, ERegisterType.NONE, EConditionType.NoCarry)},
         { 0xC3, new Instruction(EInstructionType.JP, EAddressMode.D16)},
