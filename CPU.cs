@@ -180,56 +180,27 @@ public class CPU
     }
 
 
-    private u16 ReadReg(Instruction.ERegisterType regType)
+    public u16 ReadReg(Instruction.ERegisterType regType)
     {
         switch (regType)
         {
-            case Instruction.ERegisterType.A:
-                return _registers.A;
-            
-            case Instruction.ERegisterType.F:
-                return _registers.F;
+            case Instruction.ERegisterType.A: return _registers.A;
+            case Instruction.ERegisterType.F: return _registers.F;
+            case Instruction.ERegisterType.B: return _registers.B;
+            case Instruction.ERegisterType.C: return _registers.C;
+            case Instruction.ERegisterType.D: return _registers.D;
+            case Instruction.ERegisterType.E: return _registers.E;
+            case Instruction.ERegisterType.H: return _registers.H;
+            case Instruction.ERegisterType.L: return _registers.L;
 
-            case Instruction.ERegisterType.B:
-                return _registers.B;
+            case Instruction.ERegisterType.AF: return (u16)((_registers.A << 8) | _registers.F);
+            case Instruction.ERegisterType.BC: return (u16)((_registers.B << 8) | _registers.C);
+            case Instruction.ERegisterType.DE: return (u16)((_registers.D << 8) | _registers.E);
+            case Instruction.ERegisterType.HL: return (u16)((_registers.H << 8) | _registers.L);
 
-            case Instruction.ERegisterType.C:
-                return _registers.C;
-
-            case Instruction.ERegisterType.D:
-                return _registers.D;
-
-            case Instruction.ERegisterType.E:
-                return _registers.E;
-
-            case Instruction.ERegisterType.H:
-                return _registers.H;
-
-            case Instruction.ERegisterType.L:
-                return _registers.L;
-
-
-            case Instruction.ERegisterType.AF:
-                return Reverse((u16)((_registers.F << 8) | _registers.A));
-
-            case Instruction.ERegisterType.BC:
-                return Reverse((u16)((_registers.C << 8) | _registers.B));
-
-            case Instruction.ERegisterType.DE:
-                return Reverse((u16)((_registers.E << 8) | _registers.D));
-
-            case Instruction.ERegisterType.HL:
-                return Reverse((u16)((_registers.L << 8) | _registers.H));
-
-            
-            case Instruction.ERegisterType.PC:
-                return _registers.PC;
-
-            case Instruction.ERegisterType.SP:
-                return _registers.SP;
-
-            default:
-                return 0;
+            case Instruction.ERegisterType.PC: return _registers.PC;
+            case Instruction.ERegisterType.SP: return _registers.SP;
+            default: return 0;
         }
     }
 
