@@ -52,6 +52,17 @@ public class CPU
     private bool _instructionMasterEnable;
     private bool _destinationIsMemory;
     private Instruction _currentInstruction;
+    private Instruction.ERegisterType[] _registerLookUp = 
+    {
+        Instruction.ERegisterType.B,
+        Instruction.ERegisterType.C,
+        Instruction.ERegisterType.D,
+        Instruction.ERegisterType.E,
+        Instruction.ERegisterType.H,
+        Instruction.ERegisterType.L,
+        Instruction.ERegisterType.HL,
+        Instruction.ERegisterType.A,
+    };
 
 
     // CPU 建構子
@@ -80,6 +91,10 @@ public class CPU
             { Instruction.EInstructionType.SUB, new Action(ProcSUB)},
             { Instruction.EInstructionType.SBC, new Action(ProcSBC)},
             { Instruction.EInstructionType.ADC, new Action(ProcADC)},
+            { Instruction.EInstructionType.AND, new Action(ProcAND)},
+            { Instruction.EInstructionType.OR, new Action(ProcOR)},
+            { Instruction.EInstructionType.CP, new Action(ProcCP)},
+            { Instruction.EInstructionType.CB, new Action(ProcCB)},
         };
     }
 
@@ -396,7 +411,68 @@ public class CPU
     }
 
 
+    public u8 ReadReg8(Instruction.ERegisterType regType)
+    {
+        switch (regType)
+        {
+            case Instruction.ERegisterType.A: return _registers.A;
+            case Instruction.ERegisterType.F: return _registers.F;
+            case Instruction.ERegisterType.B: return _registers.B;
+            case Instruction.ERegisterType.C: return _registers.C;
+            case Instruction.ERegisterType.D: return _registers.D;
+            case Instruction.ERegisterType.E: return _registers.E;
+            case Instruction.ERegisterType.H: return _registers.H;
+            case Instruction.ERegisterType.L: return _registers.L;
 
+            case Instruction.ERegisterType.HL: 
+                return Bus.BusRead(ReadReg(Instruction.ERegisterType.HL));
+
+            default: return 0;
+        }
+    }
+
+
+    // 設置寄存器值
+    public void SetReg8(Instruction.ERegisterType regType, u8 value)
+    {
+        switch (regType)
+        {
+            case Instruction.ERegisterType.A:
+                _registers.A = (u8)(value & 0xFF);
+                break;
+            case Instruction.ERegisterType.F:
+                _registers.F = (u8)(value & 0xFF);
+                break;
+            case Instruction.ERegisterType.B:
+                _registers.B = (u8)(value & 0xFF);
+                break;
+            case Instruction.ERegisterType.C:
+                _registers.C = (u8)(value & 0xFF);
+                break;
+            case Instruction.ERegisterType.D:
+                _registers.D = (u8)(value & 0xFF);
+                break;
+            case Instruction.ERegisterType.E:
+                _registers.E = (u8)(value & 0xFF);
+                break;
+            case Instruction.ERegisterType.H:
+                _registers.H = (u8)(value & 0xFF);
+                break;
+            case Instruction.ERegisterType.L:
+                _registers.L = (u8)(value & 0xFF);
+                break;
+
+            
+            case Instruction.ERegisterType.HL:
+                Bus.BusWrite(ReadReg(Instruction.ERegisterType.HL), value);
+                break;
+
+            default:
+                throw new ArgumentException($"Unsupported register type: {regType}");
+        }
+    }
+    
+    
     private bool GetCPUFlag(string flag)
     {
         switch (flag)
@@ -483,7 +559,14 @@ public class CPU
         return registerType >= Instruction.ERegisterType.SP;
     }
 
-
+    private Instruction.ERegisterType DecodeRegister(u8 reg)
+    {
+        if (reg > 0b111)
+        {
+            return Instruction.ERegisterType.NONE;
+        }
+        return _registerLookUp[reg];
+    }
     /*
         指令
     */
@@ -770,4 +853,158 @@ public class CPU
             a + u + c > 0xFF ? 1 : 0
         );
     }
+
+    private void ProcAND()
+    {
+        _registers.A = (u8) (_registers.A & _fetchData);
+        SetCPUFlag(_registers.A == 0 ? 1 : 0, 0, 1, 0);
+    }
+
+    private void ProcOR()
+    {
+        _registers.A = (u8) (_registers.A | (_fetchData & 0xFF));
+        SetCPUFlag(_registers.A == 0 ? 1 : 0, 0, 0, 0);
+    }
+
+    private void ProcCP()
+    {
+        int n = (int) _registers.A - (int) _fetchData;
+        SetCPUFlag(
+            n == 0 ? 1 : 0, 
+            1,
+            (((int) (_registers.A & 0x0F)) - ((int) (_fetchData & 0x0F))) < 0 ? 1 : 0,
+            n < 0 ? 1 : 0
+        );
+    }
+
+    private void ProcCB()
+    {
+        u8 op = (u8) _fetchData;
+        Instruction.ERegisterType reg = DecodeRegister((u8) (op & 0b111));
+        u8 bit = (u8) ((op >> 3) & 0b111);
+        u8 bitOp = (u8) ((op >> 6) & 0b11);
+        u8 regValue = ReadReg8(reg);
+
+        Emulator.EmulatorCycles(1);
+
+        if (reg == Instruction.ERegisterType.HL)
+        {
+            Emulator.EmulatorCycles(2);
+        }
+
+        switch (bitOp)
+        {
+            case 1 :
+                // BIT
+                SetCPUFlag(
+                    (regValue & (1 << bit)) == 1 ? 0 : 1,
+                    0,
+                    1,
+                    -1
+                );
+                return ;
+
+            case 2 :
+                // RST
+                regValue = (u8) (regValue & (~(1 << bit)));
+                SetReg8(reg, regValue);
+                return ;
+
+            case 3 :
+                // SET
+                regValue = (u8) (regValue | (1 << bit));
+                SetReg8(reg, regValue);
+                return ;
+        }
+
+        u8 flagC = (u8) (Utils.GetBit(_registers.F, 4));
+
+        switch (bit)
+        {
+            case 0 :
+                // RLC
+                int setC = 0;
+                u8 result = (u8) ((regValue << 1) & 0xFF);
+
+                if ((regValue & (1 << 7)) != 0)
+                {
+                    result = (u8) (result | 1);
+                    setC = 1;
+                }
+
+                SetReg8(reg, result);
+                SetCPUFlag(result == 0 ? 1 : 0, 0, 0, setC);
+                return ;
+
+            case 1 :
+                // RRC
+                u8 old = regValue;
+                regValue = (u8) (regValue >> 1);
+
+                SetReg8(reg, regValue);
+                SetCPUFlag(regValue == 1 ? 0 : 1, 0, 0, (old & 1) == 0 ? 0 : 1);
+                return ;
+
+            case 2 :
+                // RL
+                u8 old2 = regValue;
+                regValue = (u8) (regValue << 1);
+                regValue = (u8) (regValue | flagC);
+
+                SetReg8(reg, regValue);
+                SetCPUFlag(regValue == 0 ? 0 : 1, 0, 0, (old2 & 0x80) == 1 ? 1 : 0);
+                return ;
+
+            case 3 :
+                // RR
+                u8 old3 = regValue;
+                regValue = (u8) (regValue >> 1);
+
+                regValue = (u8) (regValue | (flagC << 7));
+
+                SetReg8(reg, regValue);
+                SetCPUFlag(regValue == 0 ? 1 : 0, 0, 0, (old3 & 1) == 0 ? 0 : 1);
+                return ;
+
+            case 4 :
+                // SLA
+                u8 old4 = regValue;
+                regValue = (u8) (regValue << 1);
+
+                SetReg8(reg, regValue);
+                SetCPUFlag(
+                    regValue == 0 ? 1 : 0,
+                    0,
+                    0,
+                    (old4 & 0x80) == 0 ? 0 : 1
+                );
+                return ;
+
+            case 5 :
+                // SRA
+                u8 u = (u8) (((System.SByte) regValue) >> 1);
+                SetReg8(reg, u);
+                SetCPUFlag(u == 0 ? 1 : 0, 0, 0, (regValue & 1) == 0 ? 0 : 1);
+                return ;
+
+            case 6 :
+                // SWAP
+                regValue = (u8) (((regValue & 0xF0) >> 4) | ((regValue & 0xF) << 4));
+                SetReg8(reg, regValue);
+                SetCPUFlag(regValue == 0 ? 1 : 0, 0, 0, 0);
+                return ;
+
+            case 7 :
+                // SRL
+                u8 u2 = (u8) (regValue >> 1);
+                SetReg8(reg, u2);
+                SetCPUFlag(u2 == 0 ? 1 : 0, 0, 0, (regValue & 1) == 0 ? 0 : 1);
+                return ;
+        }
+
+        Console.WriteLine($"Invalid CB : {op, 0:X2}");
+        return ;
+    }
+
+
 }
