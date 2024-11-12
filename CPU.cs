@@ -51,6 +51,7 @@ public class CPU
     private bool _stepping;
     private bool _instructionMasterEnable;
     private bool _destinationIsMemory;
+    private bool _enableIme;
     private Instruction _currentInstruction;
     private Instruction.ERegisterType[] _registerLookUp = 
     {
@@ -95,6 +96,17 @@ public class CPU
             { Instruction.EInstructionType.OR, new Action(ProcOR)},
             { Instruction.EInstructionType.CP, new Action(ProcCP)},
             { Instruction.EInstructionType.CB, new Action(ProcCB)},
+            { Instruction.EInstructionType.RLCA, new Action(ProcRLCA)},
+            { Instruction.EInstructionType.RRCA, new Action(ProcRRCA)},
+            { Instruction.EInstructionType.RLA, new Action(ProcRLA)},
+            { Instruction.EInstructionType.RRA, new Action(ProcRRA)},
+            { Instruction.EInstructionType.STOP, new Action(ProcSTOP)},
+            { Instruction.EInstructionType.DAA, new Action(ProcDAA)},
+            { Instruction.EInstructionType.CPL, new Action(ProcCPL)},
+            { Instruction.EInstructionType.SCF, new Action(ProcSCF)},
+            { Instruction.EInstructionType.CCF, new Action(ProcCCF)},
+            { Instruction.EInstructionType.HALT, new Action(ProcHALT)},
+
         };
     }
 
@@ -567,6 +579,20 @@ public class CPU
         }
         return _registerLookUp[reg];
     }
+    
+    
+    private bool GetFlag(string flag)
+    {
+        switch (flag)
+        {
+            case "Z": return (Utils.GetBit(_registers.F, 7) == 1);
+            case "N": return (Utils.GetBit(_registers.F, 6) == 1);
+            case "H": return (Utils.GetBit(_registers.F, 5) == 1);
+            case "C": return (Utils.GetBit(_registers.F, 4) == 1);
+            default: return false;
+        }
+    }
+    
     /*
         指令
     */
@@ -1006,5 +1032,107 @@ public class CPU
         return ;
     }
 
+    private void ProcRLCA()
+    {
+        u8 u = _registers.A;
+        int c = (u >> 7) & 1;
+        u = (u8) ((u << 1) | c);
+        _registers.A = u;
 
+        SetCPUFlag(0, 0, 0, c);
+    }
+
+    private void ProcRRCA()
+    {
+        u8 b = (u8) (_registers.A & 1);
+        _registers.A = (u8) (_registers.A >> 1);
+        _registers.A = (u8) (_registers.A | (b << 7));
+
+        SetCPUFlag(0, 0, 0, b);
+    }
+
+    private void ProcRLA()
+    {
+        u8 u = _registers.A;
+        u8 cFlag = (u8) Utils.GetBit(_registers.F, 4);
+        u8 c = (u8) ((u >> 7) & 1);
+
+        _registers.A = (u8) ((u << 1) | cFlag);
+        SetCPUFlag(0, 0, 0, c);
+    }
+
+    private void ProcRRA()
+    {
+        u8 carry = (u8) Utils.GetBit(_registers.F, 4);
+        u8 newC = (u8) (_registers.A & 1);
+
+        _registers.A = (u8) (_registers.A >> 1);
+        _registers.A = (u8) (_registers.A | (carry << 7));
+
+        SetCPUFlag(0, 0, 0, newC);
+    }
+    
+    private void ProcSTOP()
+    {   
+        Console.WriteLine("Error : ProcSTOP()");
+        Environment.Exit(-1);
+    }
+
+    private void ProcDAA()
+    {
+        u8 u = 0;
+        int fc = 0;
+
+        // 檢查半進位標誌和非負號條件是否滿足，以確定是否需要加上 6
+        if (GetFlag("H") || (!GetFlag("N") && (_registers.A & 0xF) > 9))
+        {
+            u = 6;
+        }
+
+        // 檢查進位標誌和非負號條件是否滿足，以確定是否需要加上 0x60 並設定進位標誌
+        if (GetFlag("C") || (!GetFlag("N") && _registers.A > 0x99))
+        {
+            u |= 0x60;
+            fc = 1;
+        }
+
+        // 根據 N 標誌決定是加上還是減去 u
+        _registers.A = (u8)(_registers.A + (GetFlag("N") ? -u : u));
+
+        // 更新標誌位
+        SetCPUFlag(_registers.A == 0 ? 1 : 0, -1, 0, fc);
+    }
+
+    private void ProcCPL()
+    {
+        // 取反 A 寄存器的值
+        _registers.A = (u8)~_registers.A;
+
+        // 更新標誌位：N 和 H 設為 1，其他位保持不變
+        SetCPUFlag(-1, 1, 1, -1);
+    }
+
+    private void ProcSCF()
+    {
+        SetCPUFlag(-1, 0, 0, 1);
+    }
+
+    private void ProcCCF()
+    {
+        // 取反進位標誌位 C
+        int newCarryFlag = GetFlag("C") ? 0 : 1;
+
+        // 更新標誌位：N 和 H 設為 0，C 取反，Z 保持不變
+        SetCPUFlag(-1, 0, 0, newCarryFlag);
+    }
+
+    private void ProcHALT()
+    {
+        _hallted = true;
+    }
+
+    private void ProcEI()
+    {
+        _enableIme = true;
+    }
 }

@@ -94,7 +94,7 @@ public class Instruction
         { 0x04, new Instruction(EInstructionType.INC, EAddressMode.Reg, ERegisterType.B)},
         { 0x05, new Instruction(EInstructionType.DEC, EAddressMode.Reg, ERegisterType.B)},
         { 0x06, new Instruction(EInstructionType.LD, EAddressMode.RegD8, ERegisterType.B)},
-        // { 0x07, new Instruction(EInstructionType.RLCA, EAddressMode.Implicit)},
+        { 0x07, new Instruction(EInstructionType.RLCA, EAddressMode.Implicit)},
         { 0x08, new Instruction(EInstructionType.LD, EAddressMode.A16Reg, ERegisterType.NONE, ERegisterType.SP)},
         { 0x09, new Instruction(EInstructionType.ADD, EAddressMode.RegReg, ERegisterType.HL, ERegisterType.BC)},
         { 0x0A, new Instruction(EInstructionType.LD, EAddressMode.RegMem, ERegisterType.A, ERegisterType.BC)},
@@ -102,17 +102,17 @@ public class Instruction
         { 0x0C, new Instruction(EInstructionType.INC, EAddressMode.Reg, ERegisterType.C)},
         { 0x0D, new Instruction(EInstructionType.DEC, EAddressMode.Reg, ERegisterType.C)},
         { 0x0E, new Instruction(EInstructionType.LD, EAddressMode.RegD8, ERegisterType.C)},
-        // { 0x0F, new Instruction(EInstructionType.RRCA, EAddressMode.Implicit)},
+        { 0x0F, new Instruction(EInstructionType.RRCA, EAddressMode.Implicit)},
 
         // 0x1-
-        // { 0x10, new Instruction(EInstructionType.STOP, EAddressMode.Implicit)},
+        { 0x10, new Instruction(EInstructionType.STOP, EAddressMode.Implicit)},
         { 0x11, new Instruction(EInstructionType.LD, EAddressMode.RegD16, ERegisterType.DE)},
         { 0x12, new Instruction(EInstructionType.LD, EAddressMode.MemReg, ERegisterType.DE, ERegisterType.A)},
         { 0x13, new Instruction(EInstructionType.INC, EAddressMode.Reg, ERegisterType.DE)},
         { 0x14, new Instruction(EInstructionType.INC, EAddressMode.Reg, ERegisterType.D)},
         { 0x15, new Instruction(EInstructionType.DEC, EAddressMode.Reg, ERegisterType.D)},
         { 0x16, new Instruction(EInstructionType.LD, EAddressMode.RegD8, ERegisterType.D)},
-        // { 0x17, new Instruction(EInstructionType.RLA, EAddressMode.Implicit)},
+        { 0x17, new Instruction(EInstructionType.RLA, EAddressMode.Implicit)},
         { 0x18, new Instruction(EInstructionType.JR, EAddressMode.D8)},
         { 0x19, new Instruction(EInstructionType.ADD, EAddressMode.RegReg, ERegisterType.HL, ERegisterType.DE)},
         { 0x1A, new Instruction(EInstructionType.LD, EAddressMode.RegMem, ERegisterType.A, ERegisterType.DE)},
@@ -120,7 +120,7 @@ public class Instruction
         { 0x1C, new Instruction(EInstructionType.INC, EAddressMode.Reg, ERegisterType.E)},
         { 0x1D, new Instruction(EInstructionType.DEC, EAddressMode.Reg, ERegisterType.E)},
         { 0x1E, new Instruction(EInstructionType.LD, EAddressMode.RegD8, ERegisterType.E)},
-        // { 0x1F, new Instruction(EInstructionType.RRA, EAddressMode.Implicit)},
+        { 0x1F, new Instruction(EInstructionType.RRA, EAddressMode.Implicit)},
 
         // 0x2-
         { 0x20, new Instruction(EInstructionType.JR, EAddressMode.D8, ERegisterType.NONE, ERegisterType.NONE, EConditionType.NotZero)},
@@ -130,7 +130,7 @@ public class Instruction
         { 0x24, new Instruction(EInstructionType.INC, EAddressMode.Reg, ERegisterType.H)},
         { 0x25, new Instruction(EInstructionType.DEC, EAddressMode.Reg, ERegisterType.H)},
         { 0x26, new Instruction(EInstructionType.LD, EAddressMode.RegD8, ERegisterType.H)},
-        // { 0x27, new Instruction(EInstructionType.DAA, EAddressMode.Implicit)},
+        { 0x27, new Instruction(EInstructionType.DAA, EAddressMode.Implicit)},
         { 0x28, new Instruction(EInstructionType.JR, EAddressMode.D8, ERegisterType.NONE, ERegisterType.NONE, EConditionType.Zero)},
         { 0x29, new Instruction(EInstructionType.ADD, EAddressMode.RegReg, ERegisterType.HL, ERegisterType.HL)},
         { 0x2A, new Instruction(EInstructionType.LD, EAddressMode.RegHLI, ERegisterType.A, ERegisterType.HL)},
@@ -138,7 +138,7 @@ public class Instruction
         { 0x2C, new Instruction(EInstructionType.INC, EAddressMode.Reg, ERegisterType.L)},
         { 0x2D, new Instruction(EInstructionType.DEC, EAddressMode.Reg, ERegisterType.L)},
         { 0x2E, new Instruction(EInstructionType.LD, EAddressMode.RegD8, ERegisterType.L)},
-        // { 0x2F, new Instruction(EInstructionType.CPL, EAddressMode.Implicit)},
+        { 0x2F, new Instruction(EInstructionType.CPL, EAddressMode.Implicit)},
 
         // 0x3-
         { 0x30, new Instruction(EInstructionType.JR, EAddressMode.D8, ERegisterType.NONE, ERegisterType.NONE, EConditionType.NoCarry)},
@@ -148,7 +148,7 @@ public class Instruction
         { 0x34, new Instruction(EInstructionType.INC, EAddressMode.Mem, ERegisterType.HL)},
         { 0x35, new Instruction(EInstructionType.DEC, EAddressMode.Mem, ERegisterType.HL)},
         { 0x36, new Instruction(EInstructionType.LD, EAddressMode.MemD8, ERegisterType.HL)},
-        // { 0x37, new Instruction(EInstructionType.SCF, EAddressMode.Implicit)},
+        { 0x37, new Instruction(EInstructionType.SCF, EAddressMode.Implicit)},
         { 0x38, new Instruction(EInstructionType.JR, EAddressMode.D8, ERegisterType.NONE, ERegisterType.NONE, EConditionType.Carry)},
         { 0x39, new Instruction(EInstructionType.ADD, EAddressMode.RegReg, ERegisterType.HL, ERegisterType.SP)},
         { 0x3A, new Instruction(EInstructionType.LD, EAddressMode.RegHLD, ERegisterType.A, ERegisterType.HL)},
@@ -156,7 +156,7 @@ public class Instruction
         { 0x3C, new Instruction(EInstructionType.INC, EAddressMode.Reg, ERegisterType.A)},
         { 0x3D, new Instruction(EInstructionType.DEC, EAddressMode.Reg, ERegisterType.A)},
         { 0x3E, new Instruction(EInstructionType.LD, EAddressMode.RegD8, ERegisterType.A)},
-        // { 0x3F, new Instruction(EInstructionType.CCF, EAddressMode.Implicit)},
+        { 0x3F, new Instruction(EInstructionType.CCF, EAddressMode.Implicit)},
 
         // 0x4-
         { 0x40, new Instruction(EInstructionType.LD, EAddressMode.RegReg, ERegisterType.B, ERegisterType.B)},
@@ -359,7 +359,7 @@ public class Instruction
         { 0xF8, new Instruction(EInstructionType.LD, EAddressMode.HLSPR, ERegisterType.HL, ERegisterType.SP)},
         { 0xF9, new Instruction(EInstructionType.LD, EAddressMode.RegReg, ERegisterType.SP, ERegisterType.HL)},
         { 0xFA, new Instruction(EInstructionType.LD, EAddressMode.RegA16, ERegisterType.A)},
-        // { 0xFB, new Instruction(EInstructionType.EI, EAddressMode.Implicit)},
+        { 0xFB, new Instruction(EInstructionType.EI, EAddressMode.Implicit)},
         { 0xFE, new Instruction(EInstructionType.CP, EAddressMode.RegD8, ERegisterType.A)},
         { 0xFF, new Instruction(EInstructionType.RST, EAddressMode.Implicit, ERegisterType.NONE, ERegisterType.NONE, EConditionType.None, 0x38)},
     };
