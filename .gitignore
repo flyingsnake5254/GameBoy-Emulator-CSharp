@@ -24,3 +24,6 @@ packages/
 *.cache
 project.lock.json
 project.assets.json
+
+!Release/
+!Release/**
