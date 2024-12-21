@@ -10,7 +10,7 @@
 ```
 ---
 
-#### 運行專案
+#### 專案建置與執行
 ```shell
 # 取得專案
 git clone https://github.com/flyingsnake5254/Gameboy-Emulator-CSharp.git
@@ -20,4 +20,16 @@ cd Gameboy-Emulator-CSharp
 
 # 運行專案
 dotnet run
+```
+---
+
+#### 匯出執行檔
+- Linux (Manjaro)
+```shell
+dotnet publish -c Release -r linux-x64 --self-contained true /p:PublishSingleFile=true /p:EnableCompressionInSingleFile=true
+```
+
+- Windows
+```shell
+dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:EnableCompressionInSingleFile=true
 ```
