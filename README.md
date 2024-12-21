@@ -1,5 +1,7 @@
 ## Gameboy Emulator by C#
 
+<h6 style="color:red">註：作業系統須安裝 Gtk</h6>
+
 #### 版本資訊
 ```sh
    [net9.0]: 
