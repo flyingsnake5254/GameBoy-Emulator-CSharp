@@ -23,26 +23,39 @@ dotnet run
 ```
 ---
 
-#### 匯出執行檔
-- Linux (Manjaro)
-```shell
-dotnet publish -c Release -r linux-x64 --self-contained true /p:PublishSingleFile=true /p:EnableCompressionInSingleFile=true
-
-# 執行檔路徑
-# Gameboy-Emulator-CSharp/bin/Release/net9.0/linux-x64/publish
-
-# 檔名
-# Gameboy-Emulator-CSharp
-```
+#### 專案執行檔位置
+- Linux ( Manjaro )
+    ```shell
+    Release/linux-x64/publish/Gameboy-Emulator-CSharp
+    ```
 
 - Windows
-```shell
-dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:EnableCompressionInSingleFile=true
+    ```shell
+    Release/win-x64/publish/Gameboy-Emulator-CSharp.exe
+    ```
 
-# 執行檔路徑
-# Gameboy-Emulator-CSharp/bin/Release/net9.0/win-x64/publish
+---
 
-# 檔名
-# Gameboy-Emulator-CSharp.exe
-```
+#### 匯出執行檔
+- Linux (Manjaro)
+    ```shell
+    dotnet publish -c Release -r linux-x64 --self-contained true /p:PublishSingleFile=true /p:EnableCompressionInSingleFile=true
+
+    # 執行檔路徑
+    # Gameboy-Emulator-CSharp/bin/Release/net9.0/linux-x64/publish
+
+    # 檔名
+    # Gameboy-Emulator-CSharp
+    ```
+
+- Windows
+    ```shell
+    dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:EnableCompressionInSingleFile=true
+
+    # 執行檔路徑
+    # Gameboy-Emulator-CSharp/bin/Release/net9.0/win-x64/publish
+
+    # 檔名
+    # Gameboy-Emulator-CSharp.exe
+    ```
 
