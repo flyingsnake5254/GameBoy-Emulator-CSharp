@@ -1,4 +1,5 @@
 ## Gameboy Emulator by C#
+[PPT](https://docs.google.com/presentation/d/1yT8TKOju-b1cTyCFQHvN060rL6zyQQ3aPgBHsILw9PY/edit?usp=sharing)
 
 <h6 style="color:red">註：作業系統須安裝 Gtk</h6>
 
